@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>도전카드 관리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F4EF;--card:#FFF;--p:#1B4332;--pm:#2D6A4F;--pl:#40916C;--acc:#C4956A;--accl:#E8D5B7;--txt:#1A1A1A;--mut:#8B8B8B;--bdr:#E0DDD4;--g1:#E8F5E9;--g2:#C8E6C9;--yel:#FFF9C4;--org:#FFF3E0;--blu:#E3F2FD;--red:#FDEDED}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased;padding-bottom:70px}
+.hdr{background:linear-gradient(160deg,var(--p)0%,var(--pm)60%,var(--pl)100%);padding:24px 20px 20px;color:#fff}
+.hdr-in{max-width:680px;margin:0 auto}
+.hdr-tag{font-size:10px;letter-spacing:4px;opacity:.5;margin-bottom:4px}
+.hdr h1{font-size:20px;font-weight:800}
+.hdr p{font-size:11px;opacity:.65;margin-top:3px}
+.ctn{max-width:680px;margin:0 auto;padding:0 16px}
+.sc{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 5px rgba(0,0,0,.04)}
+.st{font-size:14px;font-weight:700;color:var(--p);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.fl{margin-bottom:8px}
+.fl-l{display:block;font-size:11px;font-weight:600;color:var(--mut);margin-bottom:4px}
+.rw{display:flex;gap:8px}
+.f1{flex:1}.f2{flex:2}
+input[type=text],input[type=date],input[type=month],input[type=number],select{width:100%;padding:8px 10px;font-size:13px;font-family:inherit;border:1.5px solid var(--bdr);border-radius:8px;background:var(--bg);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--pm)}
+textarea{width:100%;padding:8px 10px;font-size:13px;font-family:inherit;border:1.5px solid var(--bdr);border-radius:8px;background:var(--bg);outline:none;resize:vertical;line-height:1.6}
+.by{background:var(--yel)}.bo{background:var(--org)}.bb{background:var(--blu)}
+.tg{display:flex;gap:5px;flex-wrap:wrap}
+.tb{padding:6px 12px;font-size:12px;font-weight:500;font-family:inherit;color:var(--txt);background:var(--bg);border:1.5px solid var(--bdr);border-radius:7px;cursor:pointer}
+.tb.a{font-weight:700;color:#fff;background:var(--p);border-color:var(--p)}
+.bb-btn{display:flex;align-items:center;gap:5px;padding:7px 0;font-size:12px;color:var(--mut);background:none;border:none;cursor:pointer;font-family:inherit;margin-bottom:4px}
+.bn{display:flex;gap:8px;margin:8px 0 24px}
+.bp{flex:2;padding:13px;font-size:13px;font-weight:600;font-family:inherit;color:#fff;background:var(--p);border:none;border-radius:10px;cursor:pointer}
+.bs{flex:1;padding:13px;font-size:13px;font-weight:600;font-family:inherit;color:var(--p);background:#fff;border:1.5px solid var(--bdr);border-radius:10px;cursor:pointer}
+.ba{width:100%;padding:14px;font-size:14px;font-weight:700;font-family:inherit;color:#fff;background:linear-gradient(135deg,var(--acc),#B8845A);border:none;border-radius:12px;cursor:pointer;box-shadow:0 3px 14px rgba(196,149,106,.3);margin-bottom:6px}
+.bd{width:100%;padding:10px;font-size:12px;font-weight:600;font-family:inherit;color:#C62828;background:var(--red);border:1px solid #FFCDD2;border-radius:8px;cursor:pointer;margin-top:4px}
+.stb{background:#fff;border-radius:12px;padding:4px;margin-bottom:10px;display:flex;gap:3px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.stb button{flex:1;padding:8px 3px;font-size:11px;font-weight:500;color:var(--mut);background:transparent;border:none;border-radius:9px;cursor:pointer;font-family:inherit}
+.stb button.a{font-weight:700;color:var(--p);background:var(--g1)}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:10px 22px;background:var(--p);color:#fff;border-radius:9px;font-size:12px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:999;animation:fiu .3s ease,fo .3s ease 1.7s forwards}
+@keyframes fiu{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes fo{to{opacity:0}}
+.hi{display:none}
+
+/* Person cards */
+.pc{display:flex;align-items:center;gap:10px;padding:12px 14px;margin-bottom:6px;background:#fff;border:1px solid var(--bdr);border-radius:11px;cursor:pointer}
+.pc:active{background:var(--g1)}
+.pc-ic{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
+.pc-nm{font-size:13px;font-weight:600}
+.pc-mt{font-size:11px;color:var(--mut);margin-top:1px}
+.pc-st{font-size:10px;font-weight:600;flex-shrink:0}
+.pc-del{padding:3px 8px;font-size:10px;color:#C62828;background:var(--red);border:1px solid #FFCDD2;border-radius:5px;cursor:pointer;font-family:inherit}
+
+/* Schedule */
+.sch-day{margin-bottom:10px}
+.sch-day-h{font-size:12px;font-weight:700;color:var(--p);padding:6px 0 4px;border-bottom:1px solid var(--g2);margin-bottom:4px}
+.sch-item{padding:8px 12px;margin-bottom:3px;background:var(--g1);border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.sch-item:active{background:var(--g2)}
+.sch-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sch-empty{font-size:12px;color:var(--mut);padding:8px 0;text-align:center}
+
+/* Tracker compact */
+.trk-w{overflow-x:auto;margin:0 -8px;padding:0 8px}
+.trk-t{width:100%;border-collapse:collapse;min-width:560px}
+.trk-t th{padding:3px 1px;font-size:8px;font-weight:600;color:var(--mut);border-bottom:1px solid var(--bdr);text-align:center}
+.trk-t td{padding:4px 1px;font-size:9px;border-bottom:1px solid #F0EDE6;text-align:center;cursor:pointer;user-select:none}
+.trk-t td:hover{background:var(--g1)}
+.trk-t .gl{font-weight:600;font-size:8px;background:var(--g1);cursor:default}
+.trk-t .sl{font-size:8px;cursor:default}
+.don{color:var(--pm);font-weight:700;font-size:12px}
+.dof{color:#ddd;font-size:12px}
+.pvv{font-size:7px;color:var(--p);font-weight:600}
+.trk-h{font-size:10px;color:var(--mut);margin-top:6px}
+
+/* Bottom tab bar */
+.btab{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--bdr);display:flex;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,.05)}
+.btab button{flex:1;padding:8px 0 6px;font-size:10px;font-family:inherit;color:var(--mut);background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.btab button.a{color:var(--p);font-weight:700}
+.btab-ic{font-size:18px}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <div class="hdr-tag">Challenge Card System</div>
+    <h1 id="hdr-title">도전카드 관리</h1>
+    <p id="hdr-sub">대시보드 · 파트너 관리 · 월간 스케줄</p>
+  </div>
+</header>
+
+<div class="ctn" id="app"></div>
+<div id="toast" class="toast hi"></div>
+
+<!-- Bottom Tab Bar -->
+<nav class="btab" id="btab">
+  <button onclick="goTab('dash')" id="tab-dash"><span class="btab-ic">🏠</span>대시보드</button>
+  <button onclick="goTab('people')" id="tab-people"><span class="btab-ic">👥</span>파트너</button>
+  <button onclick="goTab('schedule')" id="tab-schedule"><span class="btab-ic">📅</span>스케줄</button>
+  <button onclick="goTab('checkup')" id="tab-checkup"><span class="btab-ic">📋</span>체크업</button>
+  <button onclick="goTab('settings')" id="tab-settings"><span class="btab-ic">⚙️</span>설정</button>
+</nav>
+
+<script>
+// ─── DB ───
+const DB='ChallengeCard4',VER=2,ST='people',CST='checkups';
+function odb(){return new Promise((r,j)=>{const q=indexedDB.open(DB,VER);q.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains(ST))d.createObjectStore(ST,{keyPath:'id',autoIncrement:true});if(!d.objectStoreNames.contains(CST))d.createObjectStore(CST,{keyPath:'id',autoIncrement:true})};q.onsuccess=e=>r(e.target.result);q.onerror=e=>j(e.target.error)})}
+async function sav(d){const db=await odb();return new Promise((r,j)=>{const t=db.transaction(ST,'readwrite');const s=t.objectStore(ST);if(d.id)s.put(d);else s.add(d);t.oncomplete=()=>r();t.onerror=e=>j(e.target.error)})}
+async function all(){const db=await odb();return new Promise((r,j)=>{const q=db.transaction(ST,'readonly').objectStore(ST).getAll();q.onsuccess=()=>r(q.result);q.onerror=e=>j(e.target.error)})}
+async function get(id){const db=await odb();return new Promise((r,j)=>{const q=db.transaction(ST,'readonly').objectStore(ST).get(id);q.onsuccess=()=>r(q.result);q.onerror=e=>j(e.target.error)})}
+async function del(id){const db=await odb();return new Promise((r,j)=>{const t=db.transaction(ST,'readwrite');t.objectStore(ST).delete(id);t.oncomplete=()=>r();t.onerror=e=>j(e.target.error)})}
+// Checkup CRUD
+async function savCk(d){const db=await odb();return new Promise((r,j)=>{const t=db.transaction(CST,'readwrite');const s=t.objectStore(CST);if(d.id)s.put(d);else s.add(d);t.oncomplete=()=>r();t.onerror=e=>j(e.target.error)})}
+async function allCk(){const db=await odb();return new Promise((r,j)=>{const q=db.transaction(CST,'readonly').objectStore(CST).getAll();q.onsuccess=()=>r(q.result);q.onerror=e=>j(e.target.error)})}
+async function delCk(id){const db=await odb();return new Promise((r,j)=>{const t=db.transaction(CST,'readwrite');t.objectStore(CST).delete(id);t.oncomplete=()=>r();t.onerror=e=>j(e.target.error)})}
+
+// ─── Constants ───
+const CLEVELS=['제로소비자','소비자','소비자1','소비자2','소비자3'];
+const PSTEPS=['needs','준비','적용','결과'];
+const COMMS=['1류:이해','2류:설득','3류:강요','4류:구박'];
+const STATUSES=[{id:'active',label:'활동 중',icon:'🟢'},{id:'hold',label:'보류',icon:'🟡'},{id:'grad',label:'졸업(독립)',icon:'🎓'}];
+const ACTS=[{id:'pv',g:'만남',s:'PV',t:'num'},{id:'prod',g:'전달',s:'제품',t:'chk'},{id:'tool',g:'',s:'Tool',t:'chk'},{id:'trust',g:'후원',s:'신뢰',t:'chk'},{id:'stp',g:'',s:'STP',t:'chk'},{id:'evt',g:'',s:'장스오',t:'chk'},{id:'sys',g:'',s:'시스템',t:'chk'},{id:'ref',g:'',s:'소개',t:'chk'},{id:'etc',g:'',s:'기타',t:'chk'}];
+const COLORS=['#2D6A4F','#558B2F','#00695C','#4527A0','#C62828','#E65100','#1565C0','#6A1B9A','#AD1457','#00838F','#827717','#37474F','#D84315','#1B5E20','#283593','#4E342E','#00796B','#5D4037','#7B1FA2','#0277BD','#9E9D24','#546E7A','#BF360C','#33691E','#303F9F','#3E2723','#004D40','#795548','#6A1B9A','#01579B'];
+
+function mkCard(monthData){const n=new Date();return{date:n.toISOString().split('T')[0],targetName:'',category:'신',processSteps:[],goalLong:monthData?monthData.goalLong||'':'',goalMid:monthData?monthData.goalMid||'':'',goalShort:monthData?monthData.goalShort||'':'',dailyGoal:'',dailyWhy:'',dailyAchieved:'',_autoActivity:false,how:'',doing:'',feedback:'',commLevel:''}}
+
+function mkMonth(ym){return{ym:ym||'',goalLong:'',goalMid:'',goalShort:'',currentStatus:'',week1:'',week2:'',week3:'',week4:'',wkFb1:'',wkFb2:'',wkFb3:'',wkFb4:'',monthFbAchieve:'',monthFbImprove:'',monthFbNext:'',myFeedback:'',sponsorFeedback:'',tracker:{},cards:[mkCard()]}}
+
+// Amway FY: Sep~Aug (Q1=9,10,11 Q2=12,1,2 Q3=3,4,5 Q4=6,7,8)
+function fyCalc(date){
+  const y=date.getFullYear();const m=date.getMonth(); // 0-indexed
+  const fyYear=m>=8?y+1:y; // Sep onwards = next FY
+  const fyMonth=(m-8+12)%12; // 0=Sep,1=Oct,...,11=Aug
+  const q=Math.floor(fyMonth/3)+1;
+  return{fyYear,q};
+}
+function fyQuarterMonths(fyYear,q){
+  // Returns [{y,m},...] for 3 months of the quarter (m=1-indexed)
+  const startFyMonth=(q-1)*3; // 0-indexed from Sep
+  const result=[];
+  for(let i=0;i<3;i++){
+    const fm=startFyMonth+i; // 0=Sep
+    const actualMonth=(fm+8)%12; // 0-indexed real month
+    const yr=actualMonth>=8?fyYear-1:fyYear;
+    result.push({y:yr,m:actualMonth+1}); // m=1-indexed
+  }
+  return result;
+}
+
+function mkPerson(){
+  const n=new Date();
+  const fy=fyCalc(n);
+  const qms=fyQuarterMonths(fy.fyYear,fy.q);
+  const ym1=`${qms[0].y}-${String(qms[0].m).padStart(2,'0')}`;
+  const ym2=`${qms[1].y}-${String(qms[1].m).padStart(2,'0')}`;
+  const ym3=`${qms[2].y}-${String(qms[2].m).padStart(2,'0')}`;
+  const qLabel=`FY${fy.fyYear} Q${fy.q}`;
+  return{
+    name:'',group:'A',status:'active',
+    relPersonal:'',relBusiness:'',levelTarget:'',levelMe:'',
+    quarter:qLabel,
+    months:[mkMonth(ym1),mkMonth(ym2),mkMonth(ym3)],
+    archives:[],
+    activeMonth:0,
+    color:COLORS[Math.floor(Math.random()*COLORS.length)]
+  };
+}
+
+// Helper: get active month data
+function am(){return S.person?S.person.months[S.person.activeMonth||0]:null}
+
+// ─── State ───
+let S={tab:'dash',view:'main',pid:null,person:null,cardIdx:0,cardTab:0,filter:'all',levelFilter:'all',archIdx:0,archMonth:0,checkupMode:'monthly',dashMonth:0};
+const app=document.getElementById('app');
+
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.remove('hi');setTimeout(()=>e.classList.add('hi'),2000)}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ─── Navigation ───
+function goTab(t){S.tab=t;S.view='main';S.pid=null;S.person=null;updTabs();render()}
+function updTabs(){document.querySelectorAll('.btab button').forEach(b=>b.classList.remove('a'));const el=document.getElementById('tab-'+S.tab);if(el)el.classList.add('a')}
+
+// ─── Render ───
+async function render(){
+  switch(S.tab){
+    case 'dash': await rDash(); break;
+    case 'people': S.view==='main'? await rPeople() : S.view==='person'? await rPerson() : S.view==='monthly'? rMonthly() : S.view==='card'? rCard() : S.view==='archive'? rArchive() : await rPeople(); break;
+    case 'schedule': await rSchedule(); break;
+    case 'checkup': await rCheckup(); break;
+    case 'settings': await rSettings(); break;
+  }
+  if(S.view==='main')window.scrollTo({top:0});
+}
+
+// ─── Dashboard ───
+async function rDash(){
+  const ps=await all();
+  const now=new Date();
+  const dow=['일','월','화','수','목','금','토'];
+  
+  // Build 3 months: previous, current, next
+  const dashMonth=S.dashMonth||0; // -1=prev, 0=current, 1=next
+  const targetDate=new Date(now.getFullYear(),now.getMonth()+dashMonth,1);
+  const tYear=targetDate.getFullYear();
+  const tMonth=targetDate.getMonth();
+  const targetYM=`${tYear}-${String(tMonth+1).padStart(2,'0')}`;
+  const daysInMonth=new Date(tYear,tMonth+1,0).getDate();
+  
+  // Month labels
+  const prevYM=new Date(now.getFullYear(),now.getMonth()-1,1);
+  const nextYM=new Date(now.getFullYear(),now.getMonth()+1,1);
+  const monthNames=[
+    {offset:-1,label:`${prevYM.getMonth()+1}월 (전월)`,ym:`${prevYM.getFullYear()}-${String(prevYM.getMonth()+1).padStart(2,'0')}`},
+    {offset:0,label:`${now.getMonth()+1}월 (당월)`,ym:`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`},
+    {offset:1,label:`${nextYM.getMonth()+1}월 (익월)`,ym:`${nextYM.getFullYear()}-${String(nextYM.getMonth()+1).padStart(2,'0')}`}
+  ];
+
+  // This week's meetings for highlight
+  const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());
+  
+  // Build schedule for selected month
+  let weekMeetings=[];
+  for(let w=0;w<5;w++){
+    let days=[];
+    for(let d=0;d<7;d++){
+      const dayNum=w*7+d+1;
+      if(dayNum>daysInMonth){days.push(null);continue}
+      const dt=new Date(tYear,tMonth,dayNum);
+      const dayLabel=`${dayNum}(${dow[dt.getDay()]})`;
+      const isToday=dt.toDateString()===now.toDateString();
+      const isThisWeek=dt>=weekStart&&dt<new Date(weekStart.getTime()+7*86400000);
+      const meetings=[];
+      ps.forEach(p=>{
+        const mo=(p.months||[]).find(m=>m.ym===targetYM);
+        if(!mo)return;
+        const hasAnyCheck=ACTS.some(a=>mo.tracker&&mo.tracker[a.id+'_'+dayNum]);
+        if(hasAnyCheck){
+          const actLabels=ACTS.filter(a=>a.s!=='PV'&&(mo.tracker||{})[a.id+'_'+dayNum]).map(a=>a.s);
+          meetings.push({name:p.name,color:p.color,id:p.id,acts:actLabels});
+        }
+      });
+      if(meetings.length) days.push({dayNum,dayLabel,isToday,isThisWeek,meetings});
+    }
+    const validDays=days.filter(d=>d);
+    if(validDays.length) weekMeetings.push({week:w+1,days:validDays});
+  }
+
+  const totalPeople=ps.length;
+  const aGroup=ps.filter(p=>p.group==='A').length;
+  const totalCards=ps.reduce((s,p)=>(p.months||[]).reduce((s2,mo)=>s2+(mo.cards||[]).filter(c=>c.targetName).length,s),0);
+  const activePeople=ps.filter(p=>(p.status||'active')==='active').length;
+
+  // Level distribution
+  const levelCounts={};
+  CLEVELS.forEach(l=>levelCounts[l]=0);
+  ps.forEach(p=>{if(p.levelTarget&&levelCounts[p.levelTarget]!==undefined)levelCounts[p.levelTarget]++});
+
+  // Level-up list
+  const levelUps=[];
+  ps.forEach(p=>{
+    if(!p.archives||!p.archives.length)return;
+    const lastArchive=p.archives[p.archives.length-1];
+    const prevLevel=lastArchive.levelTarget||'';
+    const curLevel=p.levelTarget||'';
+    if(prevLevel&&curLevel&&prevLevel!==curLevel){
+      const prevIdx=CLEVELS.indexOf(prevLevel);
+      const curIdx=CLEVELS.indexOf(curLevel);
+      if(curIdx>prevIdx) levelUps.push({name:p.name,from:prevLevel,to:curLevel,color:p.color,id:p.id});
+    }
+  });
+
+  // Count meetings per month for summary
+  const meetingCounts=monthNames.map(mn=>{
+    let cnt=0;
+    ps.forEach(p=>{
+      const mo=(p.months||[]).find(m=>m.ym===mn.ym);
+      if(!mo||!mo.tracker)return;
+      for(let d=1;d<=31;d++){if(ACTS.some(a=>mo.tracker[a.id+'_'+d]))cnt++}
+    });
+    return cnt;
+  });
+
+  app.innerHTML=`
+    <div style="margin-top:12px">
+      <div class="sc">
+        <div class="st">📊 현황</div>
+        <div class="rw" style="gap:8px;text-align:center">
+          <div class="f1" style="padding:8px;background:var(--g1);border-radius:10px">
+            <div style="font-size:20px;font-weight:800;color:var(--p)">${totalPeople}</div>
+            <div style="font-size:9px;color:var(--mut)">전체</div>
+          </div>
+          <div class="f1" style="padding:8px;background:var(--blu);border-radius:10px">
+            <div style="font-size:20px;font-weight:800;color:#1565C0">${activePeople}</div>
+            <div style="font-size:9px;color:var(--mut)">활동 중</div>
+          </div>
+          <div class="f1" style="padding:8px;background:var(--org);border-radius:10px">
+            <div style="font-size:20px;font-weight:800;color:#E65100">${aGroup}</div>
+            <div style="font-size:9px;color:var(--mut)">집중(A)</div>
+          </div>
+          <div class="f1" style="padding:8px;background:var(--yel);border-radius:10px">
+            <div style="font-size:20px;font-weight:800;color:#F57F17">${totalCards}</div>
+            <div style="font-size:9px;color:var(--mut)">도전카드</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sc">
+        <div class="st">📈 수준별 현황</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          ${CLEVELS.map(l=>`<div style="flex:1;min-width:55px;padding:8px 4px;background:${levelCounts[l]>0?'var(--g1)':'var(--bg)'};border-radius:8px;text-align:center">
+            <div style="font-size:18px;font-weight:800;color:${levelCounts[l]>0?'var(--p)':'var(--mut)'}">${levelCounts[l]}</div>
+            <div style="font-size:8px;color:var(--mut)">${l}</div>
+          </div>`).join('')}
+        </div>
+        ${levelUps.length?`
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr)">
+            <div style="font-size:11px;font-weight:700;color:var(--pm);margin-bottom:6px">🎉 수준 향상</div>
+            ${levelUps.map(u=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px">
+              <div style="width:8px;height:8px;border-radius:50%;background:${u.color}"></div>
+              <span style="font-weight:600">${esc(u.name)}</span>
+              <span style="color:var(--mut)">${esc(u.from)} → </span>
+              <span style="color:var(--p);font-weight:700">${esc(u.to)}</span>
+            </div>`).join('')}
+          </div>
+        `:''}
+      </div>
+
+      <div class="sc">
+        <div class="st">📅 스케줄</div>
+        <!-- 3-month tabs -->
+        <div style="display:flex;gap:4px;margin-bottom:10px">
+          ${monthNames.map((mn,i)=>`<button style="flex:1;padding:8px 4px;font-size:11px;font-weight:${dashMonth===mn.offset?700:500};color:${dashMonth===mn.offset?'white':'var(--txt)'};background:${dashMonth===mn.offset?'var(--pm)':'var(--bg)'};border:1.5px solid ${dashMonth===mn.offset?'var(--pm)':'var(--bdr)'};border-radius:8px;cursor:pointer;font-family:inherit" onclick="S.dashMonth=${mn.offset};render()">
+            ${mn.label}<br><span style="font-size:9px;opacity:.7">만남 ${meetingCounts[i]}건</span>
+          </button>`).join('')}
+        </div>
+
+        ${weekMeetings.length?weekMeetings.map(wk=>`
+          <div style="margin-bottom:8px">
+            <div style="font-size:10px;font-weight:700;color:var(--pm);margin-bottom:4px">${wk.week}주차</div>
+            ${wk.days.map(d=>`
+              <div class="sch-day">
+                <div class="sch-day-h" style="${d.isToday?'color:#C62828;font-weight:800':d.isThisWeek?'color:var(--pm);font-weight:700':''}">
+                  ${d.isToday?'▶ ':''}${d.dayLabel}${d.isToday?' (오늘)':''}
+                </div>
+                ${d.meetings.map(m=>`
+                  <div class="sch-item" onclick="openPerson(${m.id})">
+                    <div class="sch-dot" style="background:${m.color}"></div>
+                    <div style="flex:1">
+                      <span style="font-weight:600">${esc(m.name)}</span>
+                      ${m.acts&&m.acts.length?`<span style="font-size:10px;color:var(--pm);margin-left:6px">${m.acts.join(' · ')}</span>`:''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `).join('')}
+          </div>
+        `).join(''):`<div class="sch-empty">${tMonth+1}월에 등록된 만남이 없습니다</div>`}
+      </div>
+    </div>
+  `;
+}
+
+// ─── People List ───
+async function rPeople(){
+  const ps=await all();
+  
+  // Apply filters
+  let filtered=ps;
+  if(S.filter!=='all') filtered=filtered.filter(p=>(p.status||'active')===S.filter);
+  if(S.levelFilter!=='all') filtered=filtered.filter(p=>p.levelTarget===S.levelFilter);
+  
+  filtered.sort((a,b)=>(a.group||'B').localeCompare(b.group||'B')||(a.name||'').localeCompare(b.name||''));
+  const aList=filtered.filter(p=>p.group==='A');
+  const bList=filtered.filter(p=>p.group!=='A');
+
+  // Level counts for filter badges
+  const lvlCounts={all:ps.length};
+  CLEVELS.forEach(l=>{lvlCounts[l]=ps.filter(p=>p.levelTarget===l).length});
+  const stCounts={all:ps.length};
+  STATUSES.forEach(s=>{stCounts[s.id]=ps.filter(p=>(p.status||'active')===s.id).length});
+
+  app.innerHTML=`
+    <div style="margin-top:12px">
+      <button class="ba" onclick="addPerson()">+ 새 파트너 추가</button>
+
+      <!-- Status Filter -->
+      <div class="sc" style="padding:10px 14px">
+        <div style="font-size:10px;font-weight:600;color:var(--mut);margin-bottom:6px">상태 필터</div>
+        <div class="tg">
+          <button class="tb ${S.filter==='all'?'a':''}" onclick="S.filter='all';render()" style="font-size:10px;padding:5px 10px">전체 ${ps.length}</button>
+          ${STATUSES.map(s=>`<button class="tb ${S.filter===s.id?'a':''}" onclick="S.filter='${s.id}';render()" style="font-size:10px;padding:5px 10px">${s.icon} ${s.label} ${stCounts[s.id]||0}</button>`).join('')}
+        </div>
+        <div style="font-size:10px;font-weight:600;color:var(--mut);margin:8px 0 6px">수준 필터</div>
+        <div class="tg">
+          <button class="tb ${S.levelFilter==='all'?'a':''}" onclick="S.levelFilter='all';render()" style="font-size:10px;padding:5px 8px">전체</button>
+          ${CLEVELS.map(l=>`<button class="tb ${S.levelFilter===l?'a':''}" onclick="S.levelFilter='${l}';render()" style="font-size:10px;padding:5px 8px">${l.replace('소비자','')||'제로'} ${lvlCounts[l]||0}</button>`).join('')}
+        </div>
+      </div>
+
+      ${aList.length?`<div style="font-size:12px;font-weight:700;color:var(--p);padding:8px 0 4px">🔥 집중 관리 (A그룹) — ${aList.length}명</div>`:''}
+      ${aList.map(p=>personCard(p)).join('')}
+
+      ${bList.length?`<div style="font-size:12px;font-weight:700;color:var(--mut);padding:8px 0 4px">📋 일반 관리 (B그룹) — ${bList.length}명</div>`:''}
+      ${bList.map(p=>personCard(p)).join('')}
+
+      ${filtered.length===0?`<div style="text-align:center;color:var(--mut);font-size:13px;padding:40px 0">${ps.length===0?'파트너를 추가해 주세요':'필터 조건에 맞는 파트너가 없습니다'}</div>`:''}
+      <div style="height:20px"></div>
+    </div>
+  `;
+}
+
+function personCard(p){
+  const cards=(p.months||[]).reduce((s,mo)=>s+(mo.cards||[]).filter(c=>c.targetName).length,0);
+  const st=STATUSES.find(s=>s.id===(p.status||'active'))||STATUSES[0];
+  const archCount=(p.archives||[]).length;
+  return`<div class="pc" onclick="openPerson(${p.id})">
+    <div class="pc-ic" style="background:${p.color||'var(--pm)'}">${(p.name||'?')[0]}</div>
+    <div style="flex:1">
+      <div class="pc-nm">${esc(p.name)||'(이름 미입력)'} <span style="font-size:10px">${st.icon}</span></div>
+      <div class="pc-mt">${p.quarter||''} · ${esc(p.levelTarget)||'수준미설정'} · 카드${cards}장${archCount?' · 📂'+archCount+'분기':''}${p.group==='A'?' · 🔥':''}</div>
+    </div>
+    <button class="pc-del" onclick="event.stopPropagation();delPerson(${p.id})">삭제</button>
+  </div>`;
+}
+
+async function addPerson(){
+  const ps=await all();
+  if(ps.length>=60){toast('최대 60명까지 관리 가능합니다');return}
+  const p=mkPerson();
+  p.name='';
+  await sav(p);
+  const ps2=await all();
+  const newest=ps2[ps2.length-1];
+  openPerson(newest.id);
+}
+
+async function delPerson(id){
+  if(!confirm('이 파트너 기록을 삭제하시겠습니까?'))return;
+  await del(id);
+  toast('삭제됨');
+  render();
+}
+
+async function openPerson(id){
+  const p=await get(id);
+  if(!p)return;
+  S.tab='people';S.view='person';S.pid=id;S.person=JSON.parse(JSON.stringify(p));
+  render();
+}
+
+// ─── Person Detail ───
+async function rPerson(){
+  const p=S.person;
+  if(!p)return;
+  if(!p.months||!p.months.length){p.months=[mkMonth(''),mkMonth(''),mkMonth('')];p.activeMonth=0}
+  const mi=p.activeMonth||0;
+  const mo=p.months[mi];
+  const cards=mo.cards||[];
+  const filled=cards.filter(c=>c.targetName).length;
+  const curYM=`${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
+  const monthLabels=p.months.map(m=>{
+    if(!m.ym)return'미설정';
+    const mm=parseInt(m.ym.split('-')[1])||0;
+    const isCur=m.ym===curYM;
+    return mm+'월'+(isCur?' ● 이번달':'');
+  });
+
+  app.innerHTML=`
+    <button class="bb-btn" onclick="savAndBack()">← 저장 후 돌아가기</button>
+
+    <div class="sc">
+      <div class="st">👤 기본 정보</div>
+      <div class="rw">
+        <div class="fl f2">
+          <label class="fl-l">이름</label>
+          <input type="text" placeholder="파트너 이름" value="${esc(p.name)}" onchange="S.person.name=this.value">
+        </div>
+        <div class="fl f1">
+          <label class="fl-l">분기 선택</label>
+          <select onchange="switchQuarter(this.value)" style="font-weight:700;color:var(--p)">
+            ${(function(){
+              const fyYr=parseInt(getFyYear(p));
+              const opts=[];
+              // Previous FY closed quarters
+              (p.archives||[]).forEach(a=>{
+                const m=a.quarter.match(/FY?(\d{4})\s*Q(\d)/);
+                if(m&&parseInt(m[1])<fyYr){
+                  if(!opts.find(o=>o.val===a.quarter))
+                    opts.push({label:a.quarter+(a.closed?' 🔒 마감':' ✏️'),val:a.quarter});
+                }
+              });
+              // Current FY 4 quarters
+              for(let q=1;q<=4;q++){
+                const ql='FY'+fyYr+' Q'+q;
+                const qms=fyQuarterMonths(fyYr,q);
+                const ml=qms.map(m=>m.m+'월').join('·');
+                const isCur=p.quarter===ql;
+                const closedArc=(p.archives||[]).find(a=>a.quarter===ql&&a.closed);
+                const openArc=(p.archives||[]).find(a=>a.quarter===ql&&!a.closed);
+                let status='';
+                if(isCur) status=' ● 현재';
+                else if(closedArc) status=' 🔒 마감';
+                else if(openArc) status=' ✏️ 작성중';
+                opts.push({label:ql+' ('+ml+')'+status,val:ql});
+              }
+              // Next FY Q1
+              const nql='FY'+(fyYr+1)+' Q1';
+              const nqms=fyQuarterMonths(fyYr+1,1);
+              const nml=nqms.map(m=>m.m+'월').join('·');
+              opts.push({label:nql+' ('+nml+')',val:nql});
+              return opts.map(o=>`<option value="${o.val}" ${o.val===p.quarter?'selected':''}>${o.label}</option>`).join('');
+            })()}
+          </select>
+        </div>
+      </div>
+      <div class="fl">
+        <label class="fl-l">그룹</label>
+        <div class="tg">
+          <button class="tb ${p.group==='A'?'a':''}" onclick="S.person.group='A';render()">🔥 A (집중)</button>
+          <button class="tb ${p.group!=='A'?'a':''}" onclick="S.person.group='B';render()">📋 B (일반)</button>
+        </div>
+      </div>
+      <div class="fl">
+        <label class="fl-l">상태</label>
+        <div class="tg">
+          ${STATUSES.map(s=>`<button class="tb ${(p.status||'active')===s.id?'a':''}" onclick="S.person.status='${s.id}';render()" style="font-size:11px">${s.icon} ${s.label}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="sc">
+      <div class="st">🤝 관계 · 수준</div>
+      <div class="rw">
+        <div class="fl f1"><label class="fl-l">개인적 관계</label>
+          <select onchange="S.person.relPersonal=this.value">
+            <option value="">선택</option>
+            ${[1,2,3,4].map(n=>`<option value="${n}단계"${p.relPersonal===n+'단계'?' selected':''}>${n}단계</option>`).join('')}
+          </select>
+        </div>
+        <div class="fl f1"><label class="fl-l">사업적 관계</label>
+          <select onchange="S.person.relBusiness=this.value">
+            <option value="">선택</option>
+            ${[1,2,3,4].map(n=>`<option value="${n}단계"${p.relBusiness===n+'단계'?' selected':''}>${n}단계</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="rw">
+        <div class="fl f1"><label class="fl-l">상대 수준</label>
+          <select onchange="S.person.levelTarget=this.value">
+            <option value="">선택</option>
+            ${CLEVELS.map(l=>`<option value="${l}"${p.levelTarget===l?' selected':''}>${l}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fl f1"><label class="fl-l">나의 역할 (목표)</label>
+          <select onchange="S.person.levelMe=this.value">
+            <option value="">선택</option>
+            ${CLEVELS.map(l=>`<option value="${l}"${p.levelMe===l?' selected':''}>${l}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      ${p.levelTarget&&p.levelMe?`<div style="background:var(--g1);border-radius:8px;padding:8px;margin-top:4px;font-size:11px;color:var(--p);font-weight:600">현재 ${esc(p.levelTarget)} → 목표 ${esc(p.levelMe)}</div>`:''}
+    </div>
+
+    <!-- Month Tabs -->
+    <div class="stb" style="margin-bottom:6px">
+      ${p.months.map((m,i)=>`<button class="${i===mi?'a':''}" onclick="S.person.activeMonth=${i};render()" style="font-size:11px">
+        ${monthLabels[i]}
+      </button>`).join('')}
+    </div>
+
+    <div class="sc" onclick="S.view='monthly';render()" style="cursor:pointer">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="st" style="margin-bottom:0">📊 ${monthLabels[mi]} 목표</div>
+        <span style="font-size:12px;color:${mo.goalShort?'var(--pm)':'var(--mut)'};font-weight:600">${mo.goalShort?'✓ 작성됨':'미작성 →'}</span>
+      </div>
+      <div class="fl" style="margin-top:6px;margin-bottom:0">
+        <label class="fl-l">년/월</label>
+        <input type="month" value="${esc(mo.ym)}" onclick="event.stopPropagation()" onchange="S.person.months[${mi}].ym=this.value;render()">
+      </div>
+      ${mo.goalShort?`<div style="font-size:12px;color:var(--mut);margin-top:4px">당월: ${esc(mo.goalShort).substring(0,40)}${mo.goalShort.length>40?'...':''}</div>`:''}
+    </div>
+
+    <div class="sc">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="st" style="margin-bottom:0">📝 도전카드 (${filled}/${cards.length}장)</div>
+        ${cards.length<31?`<button class="tb" onclick="addCard()" style="font-size:11px">+ 추가</button>`:''}
+      </div>
+      ${cards.map((c,i)=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:4px;background:${c.targetName?'var(--g1)':'var(--bg)'};border-radius:9px;cursor:pointer" onclick="openCard(${i})">
+          <span style="font-size:11px;font-weight:700;color:${c.targetName?'var(--p)':'var(--mut)'}">${i+1}</span>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:${c.targetName?600:400};color:${c.targetName?'var(--txt)':'var(--mut)'}">${esc(c.targetName)||'(미작성)'}</div>
+            <div style="font-size:10px;color:var(--mut)">${c.date}${c.category?' · '+c.category:''}${c.dailyGoal?' · 🎯':''} ${c.dailyAchieved==='Y'?'✅':c.dailyAchieved==='N'?'❌':''}${c.how&&c.how.includes('[이전 피드백]')?' 🔗':''}</div>
+          </div>
+          ${cards.length>1?`<button class="pc-del" onclick="event.stopPropagation();rmCard(${i})" style="font-size:9px">삭제</button>`:''}
+        </div>
+      `).join('')}
+    </div>
+
+    <button class="ba" onclick="savPerson()">💾 저장하기</button>
+    
+    ${(p.archives||[]).filter(a=>a.closed).length?`
+    <div class="sc">
+      <div class="st">🔒 마감된 분기 (${p.archives.filter(a=>a.closed).length}건)</div>
+      ${p.archives.filter(a=>a.closed).map((arc,ai)=>{
+        const realIdx=p.archives.indexOf(arc);
+        const arcCards=(arc.months||[]).reduce((s,mo)=>s+(mo.cards||[]).filter(c=>c.targetName).length,0);
+        return`<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:4px;background:var(--bg);border-radius:9px;cursor:pointer" onclick="S.archIdx=${realIdx};S.view='archive';render()">
+          <span style="font-size:13px">🔒</span>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">${esc(arc.quarter)}</div>
+            <div style="font-size:10px;color:var(--mut)">수준: ${esc(arc.levelTarget||'?')} · 카드 ${arcCards}장</div>
+          </div>
+          <span style="font-size:11px;color:var(--mut)">보기 →</span>
+        </div>`;
+      }).join('')}
+    </div>
+    `:''}
+    
+    <div class="sc" style="border:1.5px dashed var(--bdr)">
+      <div class="st" style="color:var(--mut)">🔒 분기 마감</div>
+      <div style="font-size:12px;color:var(--mut);margin-bottom:8px">현재 분기의 모든 활동을 마무리한 후 마감하세요.<br>마감하면 <b>읽기 전용</b>으로 잠기며 수정할 수 없습니다.<br>마감 후 자동으로 다음 분기로 전환됩니다.</div>
+      <button class="bd" onclick="closeQuarter()" style="font-size:13px;padding:12px">🔒 ${esc(p.quarter)} 마감하기</button>
+    </div>
+    <div style="height:20px"></div>
+  `;
+}
+
+function addCard(){
+  const mo=am();
+  if(!mo)return;
+  if(mo.cards.length>=31){toast('최대 31장까지 작성 가능합니다');return}
+  mo.cards.push(mkCard(mo));
+  toast('도전카드가 추가되었습니다');
+  render();
+}
+function rmCard(i){
+  const mo=am();
+  if(!mo)return;
+  if(mo.cards.length<=1){toast('최소 1장은 필요합니다');return}
+  if(!confirm(`도전카드 ${i+1}을 삭제하시겠습니까?\n해당 날짜의 트래커 활동도 함께 삭제됩니다.`))return;
+  
+  // Remove tracker entries for this card's date
+  const card=mo.cards[i];
+  const dayNum=parseInt((card.date||'').split('-')[2])||0;
+  if(dayNum>0&&mo.tracker){
+    ACTS.forEach(a=>{delete mo.tracker[a.id+'_'+dayNum]});
+  }
+  
+  mo.cards.splice(i,1);
+  render();
+}
+function openCard(i){S.cardIdx=i;S.cardTab=0;S.view='card';render()}
+
+async function savPerson(){
+  S.person.updatedAt=new Date().toISOString();
+  await sav(S.person);
+  toast('✓ 저장되었습니다');
+}
+
+function getFyYear(p){
+  const m=p.quarter?p.quarter.match(/FY?(\d{4})/):null;
+  return m?m[1]:String(new Date().getFullYear());
+}
+
+function setFyYear(val){
+  if(!S.person)return;
+  const yr=parseInt(val);if(isNaN(yr))return;
+  const curQ=S.person.quarter?S.person.quarter.match(/Q(\d)/):null;
+  const qn=curQ?parseInt(curQ[1]):fyCalc(new Date()).q;
+  S.person.quarter=`FY${yr} Q${qn}`;
+  // Recalculate months
+  const qms=fyQuarterMonths(yr,qn);
+  S.person.months.forEach((mo,i)=>{
+    if(!mo.ym||mo.ym===''){
+      mo.ym=`${qms[i].y}-${String(qms[i].m).padStart(2,'0')}`;
+    }
+  });
+  render();
+}
+
+function switchQuarter(targetLabel){
+  if(!S.person)return;
+  const p=S.person;
+  
+  // If it's the current quarter, do nothing
+  if(p.quarter===targetLabel){render();return}
+  
+  // Check if target is a closed (마감된) quarter
+  const closedIdx=(p.archives||[]).findIndex(a=>a.quarter===targetLabel&&a.closed);
+  if(closedIdx>=0){
+    S.archIdx=closedIdx;
+    S.archMonth=0;
+    S.view='archive';
+    render();
+    return;
+  }
+  
+  // Parse target
+  const m=targetLabel.match(/FY?(\d{4})\s*Q(\d)/);
+  if(!m)return;
+  const fyYear=parseInt(m[1]);
+  const qn=parseInt(m[2]);
+  
+  // Save current quarter data to archives (as open/editable)
+  if(!p.archives)p.archives=[];
+  const existingCurIdx=p.archives.findIndex(a=>a.quarter===p.quarter);
+  const curData={
+    quarter:p.quarter,
+    levelTarget:p.levelTarget,levelMe:p.levelMe,
+    relPersonal:p.relPersonal,relBusiness:p.relBusiness,
+    months:JSON.parse(JSON.stringify(p.months)),
+    closed:false,
+    savedAt:new Date().toISOString()
+  };
+  if(existingCurIdx>=0) p.archives[existingCurIdx]=curData;
+  else p.archives.push(curData);
+  
+  // Check if target exists in archives (open quarter)
+  const openIdx=p.archives.findIndex(a=>a.quarter===targetLabel&&!a.closed);
+  if(openIdx>=0){
+    // Load from archives
+    const arc=p.archives[openIdx];
+    p.quarter=arc.quarter;
+    p.months=JSON.parse(JSON.stringify(arc.months));
+    p.archives.splice(openIdx,1); // Remove from archives since it's now active
+  } else {
+    // Create new quarter
+    const qms=fyQuarterMonths(fyYear,qn);
+    const ym1=`${qms[0].y}-${String(qms[0].m).padStart(2,'0')}`;
+    const ym2=`${qms[1].y}-${String(qms[1].m).padStart(2,'0')}`;
+    const ym3=`${qms[2].y}-${String(qms[2].m).padStart(2,'0')}`;
+    
+    // Carry over from current last month
+    const lastMonth=p.months[2]||p.months[1]||p.months[0];
+    const carryGoal=lastMonth?lastMonth.monthFbNext||'':'';
+    const carryImprove=lastMonth?lastMonth.monthFbImprove||'':'';
+    
+    p.quarter=targetLabel;
+    p.months=[mkMonth(ym1),mkMonth(ym2),mkMonth(ym3)];
+    
+    if(carryGoal)p.months[0].goalShort=carryGoal;
+    if(carryImprove)p.months[0].currentStatus='[이전 분기 보완점] '+carryImprove;
+  }
+  
+  p.activeMonth=0;
+  savPerson();
+  toast(`${targetLabel}로 전환되었습니다`);
+  render();
+}
+
+function closeQuarter(){
+  if(!S.person)return;
+  const p=S.person;
+  const qLabel=p.quarter;
+  
+  if(!confirm(`⚠️ 분기 마감 안내\n\n[${qLabel}]을(를) 마감하시겠습니까?\n\n마감하면 이 분기의 모든 데이터(월간 목표, 도전카드, 피드백)가\n읽기 전용으로 잠기며 더 이상 수정할 수 없습니다.\n\n마감 전에 모든 피드백을 완료했는지 확인해 주세요.`))return;
+  
+  // Archive current quarter as closed
+  if(!p.archives)p.archives=[];
+  const existingIdx=p.archives.findIndex(a=>a.quarter===qLabel);
+  const closedData={
+    quarter:qLabel,
+    levelTarget:p.levelTarget,levelMe:p.levelMe,
+    relPersonal:p.relPersonal,relBusiness:p.relBusiness,
+    months:JSON.parse(JSON.stringify(p.months)),
+    closed:true,
+    closedAt:new Date().toISOString()
+  };
+  if(existingIdx>=0) p.archives[existingIdx]=closedData;
+  else p.archives.push(closedData);
+  
+  // Move to next quarter
+  const m=qLabel.match(/FY?(\d{4})\s*Q(\d)/);
+  if(m){
+    let fyYear=parseInt(m[1]);let qn=parseInt(m[2]);
+    qn++;if(qn>4){qn=1;fyYear++}
+    const nextLabel=`FY${fyYear} Q${qn}`;
+    
+    // Check if next quarter already exists in archives (open)
+    const nextIdx=p.archives.findIndex(a=>a.quarter===nextLabel&&!a.closed);
+    if(nextIdx>=0){
+      const arc=p.archives[nextIdx];
+      p.quarter=arc.quarter;
+      p.months=JSON.parse(JSON.stringify(arc.months));
+      p.archives.splice(nextIdx,1);
+    } else {
+      const qms=fyQuarterMonths(fyYear,qn);
+      const ym1=`${qms[0].y}-${String(qms[0].m).padStart(2,'0')}`;
+      const ym2=`${qms[1].y}-${String(qms[1].m).padStart(2,'0')}`;
+      const ym3=`${qms[2].y}-${String(qms[2].m).padStart(2,'0')}`;
+      
+      const lastMonth=p.months[2]||p.months[1]||p.months[0];
+      const carryGoal=lastMonth?lastMonth.monthFbNext||'':'';
+      const carryImprove=lastMonth?lastMonth.monthFbImprove||'':'';
+      
+      p.quarter=nextLabel;
+      p.months=[mkMonth(ym1),mkMonth(ym2),mkMonth(ym3)];
+      
+      if(carryGoal)p.months[0].goalShort=carryGoal;
+      if(carryImprove)p.months[0].currentStatus='[이전 분기 보완점] '+carryImprove;
+    }
+  }
+  
+  p.activeMonth=0;
+  savPerson();
+  toast(`${qLabel} 마감 완료. 다음 분기로 전환되었습니다`);
+  render();
+}
+async function savAndBack(){
+  if(S.person){S.person.updatedAt=new Date().toISOString();await sav(S.person)}
+  S.view='main';S.pid=null;S.person=null;render();
+}
+
+// startNewQuarter removed — replaced by closeQuarter
+
+// ─── Archive View ───
+function rArchive(){
+  const p=S.person;
+  if(!p||!p.archives)return;
+  const ai=S.archIdx||0;
+  const arc=p.archives[ai];
+  if(!arc){S.view='person';render();return}
+  const monthLabels=(arc.months||[]).map(m=>{
+    if(!m.ym)return'미설정';
+    const mm=parseInt(m.ym.split('-')[1])||0;
+    return mm+'월';
+  });
+  if(!S.archMonth) S.archMonth=0;
+  const arcMi=S.archMonth;
+  const mo=(arc.months||[])[arcMi]||(arc.months||[])[0];
+  if(!mo){S.view='person';render();return}
+  const cards=(mo.cards||[]).filter(c=>c.targetName);
+
+  app.innerHTML=`
+    <button class="bb-btn" onclick="S.view='person';render()">← 돌아가기</button>
+    <div class="sc">
+      <div class="st">🔒 ${esc(arc.quarter)} (마감됨 · 읽기 전용)</div>
+      <div style="font-size:12px;color:var(--mut);margin-bottom:8px">수준: ${esc(arc.levelTarget||'?')} → ${esc(arc.levelMe||'?')}</div>
+      <div class="stb" style="margin-bottom:4px">
+        ${(arc.months||[]).map((m,i)=>`<button class="${i===arcMi?'a':''}" onclick="S.archMonth=${i};render()" style="font-size:11px">
+          ${monthLabels[i]}
+        </button>`).join('')}
+      </div>
+    </div>
+
+    <div class="sc">
+      <div class="st">🎯 목표</div>
+      ${mo.currentStatus?`<div class="fl"><label class="fl-l">현재 상황</label><div style="font-size:12px;padding:8px;background:var(--bg);border-radius:8px">${esc(mo.currentStatus)}</div></div>`:''}
+      ${mo.goalLong?`<div class="fl"><label class="fl-l">익익월</label><div style="font-size:12px;padding:8px;background:var(--yel);border-radius:8px">${esc(mo.goalLong)}</div></div>`:''}
+      ${mo.goalMid?`<div class="fl"><label class="fl-l">익월</label><div style="font-size:12px;padding:8px;background:var(--org);border-radius:8px">${esc(mo.goalMid)}</div></div>`:''}
+      ${mo.goalShort?`<div class="fl"><label class="fl-l">당월</label><div style="font-size:12px;padding:8px;background:var(--blu);border-radius:8px">${esc(mo.goalShort)}</div></div>`:''}
+    </div>
+
+    ${cards.length?`<div class="sc">
+      <div class="st">📝 도전카드 (${cards.length}장)</div>
+      ${cards.map(c=>`
+        <div style="padding:10px 12px;margin-bottom:6px;background:var(--g1);border-radius:9px">
+          <div style="font-size:12px;font-weight:600">${esc(c.targetName)} · ${c.date} · ${c.category||''}</div>
+          ${c.dailyGoal?`<div style="font-size:11px;margin-top:4px">🎯 ${esc(c.dailyGoal)}</div>`:''}
+          ${c.how?`<div style="font-size:11px;margin-top:2px;color:var(--pm)">🔧 ${esc(c.how).substring(0,100)}${c.how.length>100?'...':''}</div>`:''}
+          ${c.doing?`<div style="font-size:11px;margin-top:2px;color:#558B2F">▶ ${esc(c.doing).substring(0,100)}${c.doing.length>100?'...':''}</div>`:''}
+          ${c.feedback?`<div style="font-size:11px;margin-top:2px;color:var(--acc)">💡 ${esc(c.feedback).substring(0,100)}${c.feedback.length>100?'...':''}</div>`:''}
+        </div>
+      `).join('')}
+    </div>`:''}
+
+    ${mo.monthFbAchieve||mo.monthFbImprove||mo.monthFbNext?`<div class="sc">
+      <div class="st">📊 월간 피드백</div>
+      ${mo.monthFbAchieve?`<div style="font-size:12px;padding:8px;background:var(--g1);border-radius:8px;margin-bottom:6px"><b>핵심 성과:</b> ${esc(mo.monthFbAchieve)}</div>`:''}
+      ${mo.monthFbImprove?`<div style="font-size:12px;padding:8px;background:var(--org);border-radius:8px;margin-bottom:6px"><b>보완할 점:</b> ${esc(mo.monthFbImprove)}</div>`:''}
+      ${mo.monthFbNext?`<div style="font-size:12px;padding:8px;background:var(--blu);border-radius:8px"><b>다음 달 과제:</b> ${esc(mo.monthFbNext)}</div>`:''}
+    </div>`:''}
+    <div style="height:20px"></div>
+  `;
+}
+
+// ─── Monthly Goal Definitions ───
+const MONTHLY_GOALS=[
+  {id:'g1',label:'제품 소개',desc:'제품을 처음 알려주는 단계',levels:['제로소비자','소비자'],color:'#1565C0'},
+  {id:'g2',label:'제품 체험',desc:'직접 써보게 하는 단계',levels:['제로소비자','소비자'],color:'#2E7D32'},
+  {id:'g3',label:'제품 체험 공유',desc:'체험 후 주변에 알리는 단계',levels:['제로소비자','소비자'],color:'#00838F'},
+  {id:'g4',label:'제품 전달',desc:'정기적으로 제품을 전달하는 단계',levels:['제로소비자','소비자'],color:'#AD1457'},
+  {id:'g5',label:'3% 달성',desc:'소비자1 → 소비자2 전환',levels:['제로소비자','소비자','소비자1'],color:'#E65100'},
+  {id:'g6',label:'3% 유지 + 3명 이상 제품 소개',desc:'소비자2 수준 안정화',levels:['제로소비자','소비자','소비자1'],color:'#4527A0'},
+  {id:'g7',label:'3% 유지 + 3명 이상에게 제품 전달',desc:'소비자3 진입 준비',levels:['제로소비자','소비자','소비자1','소비자2'],color:'#BF360C'},
+  {id:'g8',label:'BF 달성',desc:'Bronze Foundation 달성',levels:['소비자1','소비자2','소비자3'],color:'#33691E'},
+  {id:'g9',label:'BB 달성',desc:'Bronze Builder 달성',levels:['소비자1','소비자2','소비자3'],color:'#1B5E20'},
+];
+
+// ─── Monthly View ───
+function rMonthly(){
+  const p=S.person;
+  const mi=p.activeMonth||0;
+  const mo=p.months[mi];
+  const curYM=`${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
+  const monthLabels=p.months.map(m=>{
+    if(!m.ym)return'미설정';
+    const mm=parseInt(m.ym.split('-')[1])||0;
+    const isCur=m.ym===curYM;
+    return mm+'월'+(isCur?' ● 이번달':'');
+  });
+  
+  // Calculate relative month names for goals (based on selected month)
+  const selMM=parseInt((mo.ym||'').split('-')[1])||0;
+  const goalLabels={
+    short:selMM?`당월 (${selMM}월 할 일)`:'당월 목표',
+    mid:selMM?`익월 (${selMM+1>12?selMM-11:selMM+1}월 중간 경유지)`:'익월 목표',
+    long:selMM?`익익월 (${selMM+2>12?selMM-10:selMM+2}월 최종 도달점)`:'익익월 목표'
+  };
+
+  // Level-based goal filtering (used by popup)
+  const level=p.levelTarget||'';
+
+  app.innerHTML=`
+    <button class="bb-btn" onclick="S.view='person';render()">← 돌아가기</button>
+    
+    <!-- Month tabs -->
+    <div class="stb" style="margin-bottom:6px">
+      ${p.months.map((m,i)=>`<button class="${i===mi?'a':''}" onclick="S.person.activeMonth=${i};render()" style="font-size:11px">
+        ${monthLabels[i]}
+      </button>`).join('')}
+    </div>
+
+    <div class="sc">
+      <div class="st">🎯 ${monthLabels[mi]} 월간 목표 (역산 구조)</div>
+      <div class="fl"><label class="fl-l">년/월</label><input type="month" value="${esc(mo.ym)}" onchange="S.person.months[${mi}].ym=this.value;render()"></div>
+      <div class="fl"><label class="fl-l">① 현재 상황 (지금 어디에 있는가)</label><textarea rows="2" placeholder="대상과의 현재 관계, 사업 진행 상태를 팩트 기반으로 기술" onchange="S.person.months[${mi}].currentStatus=this.value">${esc(mo.currentStatus)}</textarea></div>
+      
+      <div class="fl">
+        <label class="fl-l">② ${goalLabels.long}</label>
+        <div style="display:flex;gap:6px">
+          <div onclick="openGoalPicker(${mi},'long')" style="flex:none;width:42px;height:40px;background:var(--yel);border:1.5px solid #F9A825;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;color:#F57F17;flex-direction:column">📋<span style="font-size:8px">선택</span></div>
+          <textarea rows="2" class="by" style="flex:1" placeholder="탭하여 목표 선택 또는 직접 입력" onchange="S.person.months[${mi}].goalLong=this.value">${esc(mo.goalLong)}</textarea>
+        </div>
+      </div>
+      <div class="fl">
+        <label class="fl-l">③ ${goalLabels.mid}</label>
+        <div style="display:flex;gap:6px">
+          <div onclick="openGoalPicker(${mi},'mid')" style="flex:none;width:42px;height:40px;background:var(--org);border:1.5px solid #FB8C00;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;color:#E65100;flex-direction:column">📋<span style="font-size:8px">선택</span></div>
+          <textarea rows="2" class="bo" style="flex:1" placeholder="탭하여 목표 선택 또는 직접 입력" onchange="S.person.months[${mi}].goalMid=this.value">${esc(mo.goalMid)}</textarea>
+        </div>
+      </div>
+      <div class="fl">
+        <label class="fl-l">④ ${goalLabels.short}</label>
+        <div style="display:flex;gap:6px">
+          <div onclick="openGoalPicker(${mi},'short')" style="flex:none;width:42px;height:40px;background:var(--blu);border:1.5px solid #1E88E5;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;color:#1565C0;flex-direction:column">📋<span style="font-size:8px">선택</span></div>
+          <textarea rows="2" class="bb" style="flex:1" placeholder="탭하여 목표 선택 또는 직접 입력" onchange="S.person.months[${mi}].goalShort=this.value">${esc(mo.goalShort)}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="sc">
+      <div class="st">📅 주간 목표 & 피드백</div>
+      ${[1,2,3,4].map(w=>`
+        <div style="background:var(--bg);border-radius:10px;padding:10px;margin-bottom:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--pm);margin-bottom:6px">${w}주차</div>
+          <div class="fl"><label class="fl-l">주간 목표</label><input type="text" placeholder="${w}주차 목표" value="${esc(mo['week'+w]||'')}" onchange="S.person.months[${mi}].week${w}=this.value"></div>
+          <div class="fl"><label class="fl-l">주간 피드백 (잘한 것 · 보완할 것)</label><textarea rows="2" placeholder="이번 주 성찰 — 스폰서와 소통 후 기록" onchange="S.person.months[${mi}].wkFb${w}=this.value">${esc(mo['wkFb'+w]||'')}</textarea></div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="sc">
+      <div class="st">✅ 일간 활동 트래커</div>
+      <div class="trk-w">
+        <table class="trk-t">
+          <thead><tr><th style="width:24px"></th><th style="width:30px"></th>${(function(){
+            const dow=['일','월','화','수','목','금','토'];
+            const [yy,mm]=(mo.ym||'').split('-').map(Number);
+            return Array.from({length:31},(_,i)=>{
+              let dayLabel=''+(i+1);
+              let dowLabel='';
+              let color='';
+              if(yy&&mm){
+                const dt=new Date(yy,mm-1,i+1);
+                if(dt.getMonth()===mm-1){
+                  const d=dt.getDay();
+                  dowLabel=dow[d];
+                  if(d===0) color='color:#C62828';
+                  else if(d===6) color='color:#1565C0';
+                }
+              }
+              return '<th style="'+color+'">'+(dowLabel?dowLabel+'<br>':'')+dayLabel+'</th>';
+            }).join('');
+          })()}</tr></thead>
+          <tbody>${ACTS.map(a=>`<tr><td class="gl">${a.g}</td><td class="sl">${a.s}</td>${Array.from({length:31},(_,d)=>{
+            const k=a.id+'_'+(d+1);const v=(mo.tracker||{})[k];
+            return a.t==='chk'
+              ?`<td onclick="trkTog('${k}')">${v?'<span class="don">●</span>':'<span class="dof">○</span>'}</td>`
+              :`<td onclick="trkPV('${k}')">${v?'<span class="pvv">'+v+'</span>':''}</td>`;
+          }).join('')}</tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div class="trk-h">● 셀 탭: 체크 | PV 셀 탭: 숫자 입력 | 체크하면 도전카드 자동 생성</div>
+    </div>
+
+    <div class="sc">
+      <div class="st">📊 월간 피드백</div>
+      <div class="fl"><label class="fl-l">이번 달 핵심 성과</label><textarea rows="2" style="background:var(--g1)" placeholder="이번 달 가장 의미 있었던 성과" onchange="S.person.months[${mi}].monthFbAchieve=this.value">${esc(mo.monthFbAchieve)}</textarea></div>
+      <div class="fl"><label class="fl-l">보완할 점</label><textarea rows="2" style="background:var(--org)" placeholder="다음 달에 개선할 부분" onchange="S.person.months[${mi}].monthFbImprove=this.value">${esc(mo.monthFbImprove)}</textarea></div>
+      <div class="fl"><label class="fl-l">다음 달 최우선 과제</label><textarea rows="2" style="background:var(--blu)" placeholder="다음 달 반드시 해야 할 한 가지" onchange="S.person.months[${mi}].monthFbNext=this.value">${esc(mo.monthFbNext)}</textarea></div>
+    </div>
+
+    <div class="sc">
+      <div class="st">💬 소통 피드백</div>
+      <div class="fl"><label class="fl-l">나의 피드백</label><textarea rows="3" placeholder="잘한 것, 보완할 것" onchange="S.person.months[${mi}].myFeedback=this.value">${esc(mo.myFeedback)}</textarea></div>
+      <div class="fl"><label class="fl-l">스폰서 피드백</label><textarea rows="3" class="by" placeholder="스폰서 피드백" onchange="S.person.months[${mi}].sponsorFeedback=this.value">${esc(mo.sponsorFeedback)}</textarea></div>
+    </div>
+
+    <div class="bn">
+      <button class="bs" onclick="S.view='person';render()">← 돌아가기</button>
+      <button class="bp" onclick="syncMonthlyToCards();savPerson();S.view='person';render()">💾 저장 & 도전카드 연동</button>
+    </div>
+  `;
+}
+
+// Goal popup
+let _goalTarget=null;
+
+function openGoalPicker(mi,type){
+  _goalTarget={mi,type};
+  const p=S.person;
+  const level=p?p.levelTarget||'':'';
+  const goals=level?MONTHLY_GOALS.filter(g=>g.levels.includes(level)):MONTHLY_GOALS;
+  const label=type==='short'?'당월':type==='mid'?'익월':'익익월';
+  const bgColor=type==='short'?'var(--blu)':type==='mid'?'var(--org)':'var(--yel)';
+  const existing=document.getElementById('goalPicker');
+  if(existing)existing.remove();
+  const popup=document.createElement('div');
+  popup.id='goalPicker';
+  popup.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:flex-end;justify-content:center';
+  popup.innerHTML=`
+    <div style="background:white;border-radius:20px 20px 0 0;padding:20px 16px;width:100%;max-width:680px;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--p)">${label} 목표 선택</div>
+          ${level?`<div style="font-size:11px;color:var(--pm);margin-top:2px">${esc(level)} 수준 기준</div>`:`<div style="font-size:11px;color:var(--mut);margin-top:2px">수준 미설정 — 전체 표시</div>`}
+        </div>
+        <button onclick="closeGoalPicker()" style="font-size:22px;background:none;border:none;cursor:pointer;color:var(--mut)">✕</button>
+      </div>
+      ${goals.map(g=>`
+        <div onclick="selectGoal('${esc(g.label)}')" style="display:flex;align-items:center;gap:12px;padding:14px 12px;margin-bottom:6px;background:${bgColor};border-radius:10px;cursor:pointer;border-left:4px solid ${g.color}">
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:700;color:${g.color}">${esc(g.label)}</div>
+            <div style="font-size:11px;color:var(--mut);margin-top:2px">${esc(g.desc)}</div>
+          </div>
+          <div style="font-size:20px;color:${g.color}">→</div>
+        </div>
+      `).join('')}
+      <div onclick="selectGoal('')" style="padding:12px;margin-bottom:20px;background:var(--bg);border-radius:10px;cursor:pointer;text-align:center;color:var(--mut);font-size:13px">
+        ✕ 직접 입력 (선택 취소)
+      </div>
+    </div>
+  `;
+  popup.onclick=e=>{if(e.target===popup)closeGoalPicker()};
+  document.body.appendChild(popup);
+}
+
+function closeGoalPicker(){
+  const p=document.getElementById('goalPicker');
+  if(p)p.remove();
+  _goalTarget=null;
+}
+
+function selectGoal(label){
+  if(!_goalTarget||!S.person)return;
+  const{mi,type}=_goalTarget;
+  const mo=S.person.months[mi];
+  if(type==='short')mo.goalShort=label;
+  else if(type==='mid')mo.goalMid=label;
+  else if(type==='long')mo.goalLong=label;
+  closeGoalPicker();
+  if(label)toast(`"${label}" 설정됨`);
+  render();
+}
+
+function setMonthlyGoal(type,label,mi){
+  if(!S.person)return;
+  const mo=S.person.months[mi];
+  if(type==='short') mo.goalShort=label;
+  else if(type==='mid') mo.goalMid=label;
+  else if(type==='long') mo.goalLong=label;
+  toast(`${type==='short'?'당월':type==='mid'?'익월':'익익월'} → "${label}" 입력됨`);
+  render();
+}
+
+function syncMonthlyToCards(){
+  if(!S.person)return;
+  const mo=am();
+  if(!mo)return;
+  const cards=mo.cards||[];
+  let synced=0;
+  cards.forEach(c=>{
+    if(!c.goalLong&&mo.goalLong){c.goalLong=mo.goalLong;synced++}
+    if(!c.goalMid&&mo.goalMid){c.goalMid=mo.goalMid;synced++}
+    if(!c.goalShort&&mo.goalShort){c.goalShort=mo.goalShort;synced++}
+  });
+  if(synced>0)toast('도전카드에 월간 목표가 연동되었습니다');
+}
+
+function trkTog(k){
+  const mo=am();if(!mo)return;
+  if(!mo.tracker)mo.tracker={};
+  mo.tracker[k]=!mo.tracker[k];
+  if(mo.tracker[k]){const parts=k.split('_');autoCreateCardForDay(parseInt(parts[1]))}
+  render();
+}
+function trkPV(k){
+  const mo=am();if(!mo)return;
+  const v=prompt('PV 입력:',(mo.tracker||{})[k]||'');
+  if(v!==null){if(!mo.tracker)mo.tracker={};mo.tracker[k]=v;if(v){const parts=k.split('_');autoCreateCardForDay(parseInt(parts[1]))}render()}
+}
+
+function autoCreateCardForDay(dayNum){
+  if(!S.person)return;const mo=am();if(!mo)return;
+  const ym=mo.ym||'';
+  if(!ym){toast('년/월을 먼저 설정해 주세요');return}
+  const dateStr=ym+'-'+String(dayNum).padStart(2,'0');
+  const existing=mo.cards.find(c=>c.date===dateStr);
+  if(existing){updateCardActivities(existing,dayNum);return}
+  if(mo.cards.length>=31)return;
+  const card=mkCard(mo);card.date=dateStr;card.targetName=S.person.name||'';
+  updateCardActivities(card,dayNum);mo.cards.push(card);
+  mo.cards.sort((a,b)=>a.date.localeCompare(b.date));
+  toast(`${dayNum}일 도전카드가 자동 생성되었습니다`);
+}
+
+function updateCardActivities(card,dayNum){
+  const mo=am();if(!mo||!mo.tracker)return;const t=mo.tracker;
+  const deliveryLabels=[];const supportLabels=[];
+  ACTS.forEach(a=>{
+    const k=a.id+'_'+dayNum;
+    if(t[k]){
+      const label=a.t==='num'?a.s+' '+t[k]:a.s;
+      if(a.s==='PV'||a.s==='제품'||a.s==='Tool') deliveryLabels.push(label);
+      else supportLabels.push(label);
+    }
+  });
+  const allLabels=[];
+  if(deliveryLabels.length) allLabels.push('📦'+deliveryLabels.join(','));
+  if(supportLabels.length) allLabels.push('🤝'+supportLabels.join(','));
+  if(allLabels.length>0&&(!card.dailyGoal||card._autoActivity)){
+    card.dailyGoal=allLabels.join(' | ');
+    card._autoActivity=true;
+  }
+}
+
+function scheduleNext(cardIdx){
+  const p=S.person;const mo=am();if(!p||!mo)return;
+  const curCard=mo.cards[cardIdx];
+  const nextDate=prompt('다음 만남 날짜를 입력하세요 (예: 15)','');
+  if(!nextDate)return;const dayNum=parseInt(nextDate);
+  if(isNaN(dayNum)||dayNum<1||dayNum>31){toast('1~31 사이 숫자를 입력해 주세요');return}
+  if(!mo.tracker)mo.tracker={};mo.tracker['pv_'+dayNum]=mo.tracker['pv_'+dayNum]||'1';
+  const ym=mo.ym||'';const dateStr=ym?ym+'-'+String(dayNum).padStart(2,'0'):'';
+  if(!dateStr){toast('년/월을 먼저 설정해 주세요');return}
+  let nextCard=mo.cards.find(c=>c.date===dateStr);
+  if(!nextCard){if(mo.cards.length>=31){toast('카드 31장 초과');return}nextCard=mkCard(mo);nextCard.date=dateStr;nextCard.targetName=p.name||'';mo.cards.push(nextCard);mo.cards.sort((a,b)=>a.date.localeCompare(b.date))}
+  if(curCard.feedback){const hint='[이전 피드백] '+curCard.feedback;if(!nextCard.how)nextCard.how=hint;else if(!nextCard.how.includes('[이전 피드백]'))nextCard.how=hint+'\n\n'+nextCard.how}
+  if(curCard.dailyAchieved==='N'&&curCard.dailyGoal&&!nextCard.dailyGoal){nextCard.dailyGoal='[재도전] '+curCard.dailyGoal}
+  savPerson();const newIdx=mo.cards.findIndex(c=>c.date===dateStr);
+  if(newIdx>=0){S.cardIdx=newIdx;S.cardTab=0;S.view='card'}
+  toast(`${dayNum}일 다음 만남이 예약되었습니다`);render();
+}
+
+// ─── Card View ───
+function rCard(){
+  const mo=am();if(!mo)return;
+  const c=mo.cards[S.cardIdx];
+  if(!c){S.view='person';render();return}
+  const t=S.cardTab;
+  let tc='';
+
+  // Auto-sync tracker activities to dailyGoal on every render
+  const cardDay=parseInt((c.date||'').split('-')[2])||0;
+  if(cardDay>0&&mo.tracker){
+    const hasChecked=ACTS.some(a=>mo.tracker[a.id+'_'+cardDay]);
+    if(hasChecked) updateCardActivities(c,cardDay);
+  }
+
+  if(t===0){
+    // Get activities for this card's date
+    const trkActs=cardDay>0?ACTS.map(a=>({...a,checked:!!((mo.tracker||{})[a.id+'_'+cardDay])})):[];
+    
+    tc=`
+      <div class="sc">
+        <div class="st">📝 도전카드 ${S.cardIdx+1}</div>
+        <div class="rw"><div class="fl f1"><label class="fl-l">일자</label><input type="date" value="${esc(c.date)}" onchange="uc('date',this.value)"></div><div class="fl f2"><label class="fl-l">대상 이름</label><input type="text" placeholder="이름" value="${esc(c.targetName)}" onchange="uc('targetName',this.value)"></div></div>
+        <div class="fl"><label class="fl-l">구분 (APRR)</label><div class="tg">${['신','생','활'].map(v=>`<button class="tb ${c.category===v?'a':''}" onclick="uc('category','${v}')">${v==='신'?'신(신규·RR)':v==='생'?'생(생산성·P)':'활(활동성·A)'}</button>`).join('')}</div></div>
+        ${S.person.relPersonal||S.person.levelTarget?`<div style="background:var(--g1);border-radius:8px;padding:8px;margin-top:4px;font-size:11px;color:var(--p)">관계: 개인${esc(S.person.relPersonal||'?')} / 사업${esc(S.person.relBusiness||'?')} &nbsp;|&nbsp; ${esc(S.person.levelTarget||'?')} → ${esc(S.person.levelMe||'?')}</div>`:''}
+      </div>
+      <div class="sc">
+        <div class="st">⚡ 동기 (Process 4단계)</div>
+        <div class="tg">${PSTEPS.map(s=>`<button class="tb ${c.processSteps.includes(s)?'a':''}" onclick="utog('${s}')">${s}</button>`).join('')}</div>
+      </div>
+      ${cardDay>0?`<div class="sc">
+        <div class="st">📦 오늘의 활동 계획</div>
+        <div style="font-size:11px;color:var(--mut);margin-bottom:8px">트래커에서 연동됩니다. 여기서도 수정 가능합니다.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+          <div style="width:100%;font-size:11px;font-weight:600;color:var(--pm);margin-bottom:2px">📦 전달</div>
+          ${trkActs.filter(a=>a.s==='PV'||a.s==='제품'||a.s==='Tool').map(a=>`<button class="tb ${a.checked?'a':''}" onclick="trkTogCard('${a.id}',${cardDay})" style="font-size:11px;padding:5px 10px">${a.s}</button>`).join('')}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">
+          <div style="width:100%;font-size:11px;font-weight:600;color:var(--pm);margin-bottom:2px">🤝 후원</div>
+          ${trkActs.filter(a=>a.s==='신뢰'||a.s==='STP'||a.s==='장스오'||a.s==='시스템'||a.s==='소개'||a.s==='기타').map(a=>`<button class="tb ${a.checked?'a':''}" onclick="trkTogCard('${a.id}',${cardDay})" style="font-size:11px;padding:5px 10px">${a.s}</button>`).join('')}
+        </div>
+      </div>`:''}`;
+  }else if(t===1){
+    const mo2=am();
+    const hasMonthly=mo2.goalLong||mo2.goalMid||mo2.goalShort;
+    const synced=c.goalLong===mo2.goalLong&&c.goalMid===mo2.goalMid&&c.goalShort===mo2.goalShort;
+    tc=`<div class="sc">
+      <div class="st">🎯 목표(What)</div>
+      <div style="background:var(--g1);border-radius:8px;padding:8px;margin-bottom:10px;font-size:11px;color:var(--p)">역산: 최종→중기→단기 &nbsp;|&nbsp; 월간 목표에서 자동 연동됩니다</div>
+      ${hasMonthly&&!synced?`<button class="tb a" onclick="syncGoals()" style="width:100%;margin-bottom:10px;padding:10px;font-size:12px">🔄 월간 목표에서 다시 가져오기</button>`:''}
+      <div class="fl"><label class="fl-l">익익월 (최종)</label><textarea rows="2" class="by" placeholder="최종 목표" onchange="uc('goalLong',this.value)">${esc(c.goalLong)}</textarea></div>
+      <div class="fl"><label class="fl-l">익월 (중기)</label><textarea rows="2" class="bo" placeholder="중기 목표" onchange="uc('goalMid',this.value)">${esc(c.goalMid)}</textarea></div>
+      <div class="fl"><label class="fl-l">당월 (단기)</label><textarea rows="2" class="bb" placeholder="이번 달 목표" onchange="uc('goalShort',this.value)">${esc(c.goalShort)}</textarea></div>
+    </div>`;
+  }else{
+    tc=`
+      <div class="sc">
+        <div class="st">🎯 목표 (What & Why)</div>
+        ${c._autoActivity?`<div style="background:var(--org);border-radius:8px;padding:8px;margin-bottom:8px;font-size:11px;color:#E65100">📌 트래커에서 자동 입력된 활동입니다. 자유롭게 수정하세요.</div>`:''}
+        <div class="fl">
+          <label class="fl-l">무엇을? (What) — 오늘 이 만남에서 달성할 것</label>
+          <textarea rows="2" style="background:var(--g1);border-color:var(--g2);font-weight:600" placeholder="예) 소비자1으로 전환 — 주변에 제품 전달 약속 받기" onchange="uc('dailyGoal',this.value);am().cards[S.cardIdx]._autoActivity=false">${esc(c.dailyGoal)}</textarea>
+        </div>
+        <div class="fl">
+          <label class="fl-l">왜? (Why) — 이것을 달성해야 하는 이유</label>
+          <textarea rows="2" style="background:var(--blu);border-color:#BBDEFB" placeholder="예) 이분이 소비자1이 되면 본인의 자신감이 올라가고 복제의 시작점이 됨" onchange="uc('dailyWhy',this.value)">${esc(c.dailyWhy)}</textarea>
+        </div>
+      </div>
+      <div class="sc"><div class="st">🔧 방법(How)</div><textarea rows="4" placeholder="사전 계획한 질문, 접근 방법" onchange="uc('how',this.value)">${esc(c.how)}</textarea></div>
+      <div class="sc"><div class="st">▶️ 진행(Doing)</div><textarea rows="4" placeholder="실제 진행된 내용" onchange="uc('doing',this.value)">${esc(c.doing)}</textarea></div>
+      <div class="sc"><div class="st">💡 피드백</div><textarea rows="3" placeholder="잘한 점, 보완할 점" onchange="uc('feedback',this.value)">${esc(c.feedback)}</textarea>
+        <div class="fl" style="margin-top:8px"><label class="fl-l">소통 단계</label><div class="tg">${COMMS.map(cl=>`<button class="tb ${c.commLevel===cl?'a':''}" onclick="uc('commLevel',c.commLevel==='${cl}'?'':'${cl}')">${cl}</button>`).join('')}</div></div>
+        ${c.dailyGoal?`<div class="fl" style="margin-top:10px"><label class="fl-l">목표(What) 달성 여부</label><div class="tg"><button class="tb ${c.dailyAchieved==='Y'?'a':''}" onclick="uc('dailyAchieved',c.dailyAchieved==='Y'?'':'Y')">✅ 달성</button><button class="tb ${c.dailyAchieved==='N'?'a':''}" onclick="uc('dailyAchieved',c.dailyAchieved==='N'?'':'N')">❌ 미달성</button></div></div>`:''}
+      </div>
+      <div class="sc" style="border:2px dashed var(--acc);background:var(--org)">
+        <div class="st" style="color:var(--acc)">📅 다음 만남 예약</div>
+        <div style="font-size:12px;color:var(--mut);margin-bottom:10px">피드백의 보완할 점이 다음 카드의 방법(How)에 자동으로 연결됩니다.<br>미달성 목표는 다음 카드에 [재도전]으로 이월됩니다.</div>
+        <button class="ba" onclick="scheduleNext(${S.cardIdx})" style="margin:0">📅 다음 만남 날짜 설정 →</button>
+      </div>`;
+  }
+
+  app.innerHTML=`
+    <button class="bb-btn" onclick="S.view='person';render()">← 돌아가기</button>
+    <div class="stb"><button class="${t===0?'a':''}" onclick="S.cardTab=0;render()">기본·활동</button><button class="${t===1?'a':''}" onclick="S.cardTab=1;render()">목표</button><button class="${t===2?'a':''}" onclick="S.cardTab=2;render()">실행·피드백</button></div>
+    ${tc}
+    <div class="bn">
+      ${t>0?`<button class="bs" onclick="S.cardTab=${t-1};render()">← 이전</button>`:`<button class="bs" onclick="S.view='person';render()">← 돌아가기</button>`}
+      ${t<2?`<button class="bp" onclick="S.cardTab=${t+1};render()">다음 →</button>`:`<button class="bp" onclick="savPerson();S.view='person';render()">💾 저장</button>`}
+    </div>`;
+}
+
+function uc(k,v){
+  const mo=am();if(!mo)return;
+  const c=mo.cards[S.cardIdx];
+  if(k==='date'&&c.date!==v){
+    // Move tracker from old date to new date
+    const oldDay=parseInt((c.date||'').split('-')[2])||0;
+    const newDay=parseInt((v||'').split('-')[2])||0;
+    if(oldDay>0&&newDay>0&&oldDay!==newDay&&mo.tracker){
+      ACTS.forEach(a=>{
+        const oldK=a.id+'_'+oldDay;
+        const newK=a.id+'_'+newDay;
+        if(mo.tracker[oldK]&&!mo.tracker[newK]){
+          mo.tracker[newK]=mo.tracker[oldK];
+          delete mo.tracker[oldK];
+        }
+      });
+    }
+    c.date=v;
+    if(newDay>0) updateCardActivities(c,newDay);
+    render();return;
+  }
+  c[k]=v;
+  if(k==='category'||k==='commLevel'||k==='dailyAchieved')render();
+}
+function utog(s){const mo=am();if(!mo)return;const a=mo.cards[S.cardIdx].processSteps;const i=a.indexOf(s);if(i>=0)a.splice(i,1);else a.push(s);render()}
+function trkTogCard(actId,dayNum){
+  const mo=am();if(!mo)return;
+  if(!mo.tracker)mo.tracker={};
+  const k=actId+'_'+dayNum;
+  mo.tracker[k]=!mo.tracker[k];
+  updateCardActivities(mo.cards[S.cardIdx],dayNum);
+  render();
+}
+function syncGoals(){
+  const mo=am();if(!mo)return;
+  const c=mo.cards[S.cardIdx];
+  c.goalLong=mo.goalLong||'';c.goalMid=mo.goalMid||'';c.goalShort=mo.goalShort||'';
+  toast('월간 목표가 동기화되었습니다');render();
+}
+
+// ─── Schedule ───
+let schMonth=1; // 0=prev, 1=current, 2=next
+async function rSchedule(){
+  const ps=await all();
+  const now=new Date();
+  const dow=['일','월','화','수','목','금','토'];
+  
+  // Build 3 months: prev, current, next
+  const curYM=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const displayYMs=[];
+  for(let i=-1;i<=1;i++){
+    const dt=new Date(now.getFullYear(),now.getMonth()+i,1);
+    displayYMs.push(`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`);
+  }
+  const mLabels=['전월','이번달','익월'];
+  
+  if(schMonth<0||schMonth>2) schMonth=1;
+  const selYM=displayYMs[schMonth]||curYM;
+  const [sy,sm]=selYM.split('-').map(Number);
+  const daysInMonth=new Date(sy,sm,0).getDate();
+  const firstDow=new Date(sy,sm-1,1).getDay(); // 0=Sun
+  
+  // Build calendar data
+  const calDays=[];
+  // Empty cells before 1st
+  for(let i=0;i<firstDow;i++) calDays.push(null);
+  // Days of month
+  for(let d=1;d<=daysInMonth;d++){
+    const dt=new Date(sy,sm-1,d);
+    const isToday=dt.toDateString()===now.toDateString();
+    const isSun=dt.getDay()===0;
+    const isSat=dt.getDay()===6;
+    const meetings=[];
+    ps.forEach(p=>{
+      const mo=(p.months||[]).find(m=>m.ym===selYM);
+      if(!mo)return;
+      const hasAny=ACTS.some(a=>(mo.tracker||{})[a.id+'_'+d]);
+      if(hasAny){
+        const actLabels=ACTS.filter(a=>a.s!=='PV'&&(mo.tracker||{})[a.id+'_'+d]).map(a=>a.s);
+        meetings.push({name:p.name,color:p.color,id:p.id,acts:actLabels});
+      }
+    });
+    calDays.push({day:d,isToday,isSun,isSat,meetings});
+  }
+  // Fill remaining cells
+  while(calDays.length%7!==0) calDays.push(null);
+  
+  // Count meetings per month
+  const meetingCounts=displayYMs.map(ym=>{
+    let cnt=0;
+    ps.forEach(p=>{
+      const mo=(p.months||[]).find(m=>m.ym===ym);
+      if(!mo||!mo.tracker)return;
+      for(let d=1;d<=31;d++){if(ACTS.some(a=>mo.tracker[a.id+'_'+d]))cnt++}
+    });
+    return cnt;
+  });
+
+  app.innerHTML=`
+    <div style="margin-top:12px">
+      <!-- Month tabs -->
+      <div style="display:flex;gap:4px;margin-bottom:8px">
+        ${displayYMs.map((ym,i)=>{
+          const [yy,mm]=ym.split('-');
+          return`<button style="flex:1;padding:8px 4px;font-size:11px;font-weight:${i===schMonth?700:500};color:${i===schMonth?'white':'var(--txt)'};background:${i===schMonth?'var(--pm)':'var(--bg)'};border:1.5px solid ${i===schMonth?'var(--pm)':'var(--bdr)'};border-radius:8px;cursor:pointer;font-family:inherit" onclick="schMonth=${i};render()">
+            ${mm}월 (${mLabels[i]})<br><span style="font-size:9px;opacity:.7">만남 ${meetingCounts[i]}건</span>
+          </button>`;
+        }).join('')}
+      </div>
+
+      <div class="sc">
+        <div class="st">📅 ${sy}년 ${sm}월 월간 스케줄</div>
+        
+        <!-- Calendar header -->
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:4px">
+          ${dow.map((d,i)=>`<div style="text-align:center;font-size:10px;font-weight:700;padding:6px 0;color:${i===0?'#C62828':i===6?'#1565C0':'var(--mut)'}">${d}</div>`).join('')}
+        </div>
+        
+        <!-- Calendar grid -->
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+          ${calDays.map(cell=>{
+            if(!cell) return`<div style="min-height:60px"></div>`;
+            const d=cell;
+            const hasMeeting=d.meetings.length>0;
+            return`<div style="min-height:60px;padding:3px;border-radius:6px;background:${d.isToday?'var(--g1)':hasMeeting?'#FAFAF7':'white'};border:${d.isToday?'2px solid var(--pm)':'1px solid #F0EDE6'};cursor:pointer;position:relative" onclick="showDayDetail(${d.day},'${selYM}')"> 
+              <div style="font-size:10px;font-weight:${d.isToday?800:600};color:${d.isToday?'#C62828':d.isSun?'#C62828':d.isSat?'#1565C0':'var(--txt)'};margin-bottom:2px">${d.day}</div>
+              ${d.meetings.slice(0,3).map(m=>`<div style="font-size:7px;padding:1px 3px;margin-bottom:1px;border-radius:3px;background:${m.color};color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(m.name)}</div>`).join('')}
+              ${d.meetings.length>3?`<div style="font-size:7px;color:var(--mut)">+${d.meetings.length-3}명</div>`:''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+      
+      <!-- Day detail popup area -->
+      <div id="dayDetail"></div>
+      
+      <div style="height:20px"></div>
+    </div>
+  `;
+}
+
+function showDayDetail(day,ym){
+  const detailEl=document.getElementById('dayDetail');
+  if(!detailEl)return;
+  const dow=['일','월','화','수','목','금','토'];
+  const [sy,sm]=ym.split('-').map(Number);
+  const dt=new Date(sy,sm-1,day);
+  const dayLabel=`${sm}월 ${day}일 (${dow[dt.getDay()]})`;
+  
+  all().then(ps=>{
+    // Find meetings for this day
+    const meetings=[];
+    const noMeeting=[];
+    ps.forEach(p=>{
+      const mo=(p.months||[]).find(m=>m.ym===ym);
+      if(!mo)return;
+      const hasAny=ACTS.some(a=>(mo.tracker||{})[a.id+'_'+day]);
+      if(hasAny){
+        const actLabels=ACTS.filter(a=>a.s!=='PV'&&(mo.tracker||{})[a.id+'_'+day]).map(a=>a.s);
+        meetings.push({name:p.name,color:p.color,id:p.id,acts:actLabels});
+      } else {
+        noMeeting.push({name:p.name,color:p.color,id:p.id});
+      }
+    });
+    
+    detailEl.innerHTML=`
+      <div class="sc" style="border:2px solid var(--pm);margin-top:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="st" style="margin-bottom:0">📌 ${dayLabel}</div>
+          <button onclick="document.getElementById('dayDetail').innerHTML=''" style="font-size:11px;color:var(--mut);background:none;border:none;cursor:pointer;font-family:inherit">✕ 닫기</button>
+        </div>
+        
+        ${meetings.length?`
+          <div style="font-size:11px;font-weight:600;color:var(--pm);margin-bottom:6px">만남 예정 (${meetings.length}명)</div>
+          ${meetings.map(m=>`
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:4px;background:var(--g1);border-radius:8px">
+              <div class="sch-dot" style="background:${m.color}"></div>
+              <div style="flex:1;cursor:pointer" onclick="openPerson(${m.id})">
+                <span style="font-weight:600;font-size:13px">${esc(m.name)}</span>
+                ${m.acts.length?`<div style="font-size:11px;color:var(--pm);margin-top:2px">${m.acts.join(' · ')}</div>`:''}
+              </div>
+              <button onclick="moveMeeting(${m.id},${day},'${ym}')" style="font-size:10px;color:#1565C0;background:var(--blu);border:1px solid #BBDEFB;border-radius:5px;padding:3px 8px;cursor:pointer;font-family:inherit">변경</button>
+              <button onclick="removeFromDay(${m.id},${day},'${ym}')" style="font-size:10px;color:#C62828;background:var(--red);border:1px solid #FFCDD2;border-radius:5px;padding:3px 8px;cursor:pointer;font-family:inherit">삭제</button>
+            </div>
+          `).join('')}
+        `:`<div style="font-size:12px;color:var(--mut);margin-bottom:8px">이 날 만남이 없습니다</div>`}
+        
+        ${noMeeting.length&&!meetings.length?`
+          <div style="font-size:12px;color:var(--mut);padding:8px 0;text-align:center">
+            만남을 추가하려면 👥 파트너 탭에서<br>해당 파트너의 일간 트래커에 체크하세요
+          </div>
+        `:ps.length===0?'<div style="font-size:12px;color:var(--mut)">파트너를 먼저 등록해 주세요</div>':''}
+      </div>
+    `;
+    detailEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+  });
+}
+
+async function addToDay(pid,day,ym){
+  const p=await get(pid);
+  if(!p)return;
+  const mo=(p.months||[]).find(m=>m.ym===ym);
+  if(!mo){toast('해당 월의 데이터가 없습니다');return}
+  if(!mo.tracker)mo.tracker={};
+  mo.tracker['pv_'+day]='1';
+  p.updatedAt=new Date().toISOString();
+  await sav(p);
+  toast(`${p.name} ${day}일 만남 추가`);
+  showDayDetail(day,ym);
+  // Refresh calendar after a short delay
+  setTimeout(()=>render(),300);
+}
+
+async function removeFromDay(pid,day,ym){
+  const p=await get(pid);
+  if(!p)return;
+  const mo=(p.months||[]).find(m=>m.ym===ym);
+  if(!mo||!mo.tracker)return;
+  
+  ACTS.forEach(a=>{delete mo.tracker[a.id+'_'+day]});
+  
+  const dateStr=ym+'-'+String(day).padStart(2,'0');
+  if(mo.cards){
+    const cardIdx=mo.cards.findIndex(c=>c.date===dateStr);
+    if(cardIdx>=0&&mo.cards.length>1){
+      mo.cards.splice(cardIdx,1);
+    } else if(cardIdx>=0&&mo.cards.length===1){
+      mo.cards[0]=mkCard(mo);
+    }
+  }
+  
+  p.updatedAt=new Date().toISOString();
+  await sav(p);
+  toast(`${p.name} ${day}일 만남 + 도전카드 삭제`);
+  showDayDetail(day,ym);
+  setTimeout(()=>render(),300);
+}
+
+async function moveMeeting(pid,fromDay,ym){
+  const newDay=prompt(`${fromDay}일 만남을 몇 일로 변경하시겠습니까?`,'');
+  if(!newDay)return;
+  const toDay=parseInt(newDay);
+  if(isNaN(toDay)||toDay<1||toDay>31){toast('1~31 사이 숫자를 입력해 주세요');return}
+  if(toDay===fromDay){toast('같은 날짜입니다');return}
+  
+  const p=await get(pid);
+  if(!p)return;
+  const mo=(p.months||[]).find(m=>m.ym===ym);
+  if(!mo)return;
+  if(!mo.tracker)mo.tracker={};
+  
+  // Move tracker entries from old day to new day
+  ACTS.forEach(a=>{
+    const oldK=a.id+'_'+fromDay;
+    const newK=a.id+'_'+toDay;
+    if(mo.tracker[oldK]){
+      mo.tracker[newK]=mo.tracker[oldK];
+      delete mo.tracker[oldK];
+    }
+  });
+  
+  // Move challenge card date
+  const oldDateStr=ym+'-'+String(fromDay).padStart(2,'0');
+  const newDateStr=ym+'-'+String(toDay).padStart(2,'0');
+  if(mo.cards){
+    const card=mo.cards.find(c=>c.date===oldDateStr);
+    if(card){
+      card.date=newDateStr;
+      // Update dailyGoal with new day's activities
+      updateCardActivitiesDirect(card,toDay,mo);
+      mo.cards.sort((a,b)=>a.date.localeCompare(b.date));
+    }
+  }
+  
+  p.updatedAt=new Date().toISOString();
+  await sav(p);
+  toast(`${p.name} ${fromDay}일 → ${toDay}일로 변경`);
+  showDayDetail(toDay,ym);
+  setTimeout(()=>render(),300);
+}
+
+// Direct version that takes mo parameter (for use outside of active person context)
+function updateCardActivitiesDirect(card,dayNum,mo){
+  if(!mo||!mo.tracker)return;const t=mo.tracker;
+  const deliveryLabels=[];const supportLabels=[];
+  ACTS.forEach(a=>{
+    const k=a.id+'_'+dayNum;
+    if(t[k]){
+      const label=a.t==='num'?a.s+' '+t[k]:a.s;
+      if(a.s==='PV'||a.s==='제품'||a.s==='Tool') deliveryLabels.push(label);
+      else supportLabels.push(label);
+    }
+  });
+  const allLabels=[];
+  if(deliveryLabels.length) allLabels.push('📦'+deliveryLabels.join(','));
+  if(supportLabels.length) allLabels.push('🤝'+supportLabels.join(','));
+  if(allLabels.length>0&&(!card.dailyGoal||card._autoActivity)){
+    card.dailyGoal=allLabels.join(' | ');card._autoActivity=true;
+  }
+}
+
+// ─── Checkup ───
+let ckData=null; // current checkup being edited
+
+async function rCheckup(){
+  const ps=await all();
+  const now=new Date();
+  const mode=S.checkupMode||'monthly';
+  
+  // Load or create checkup data for current period
+  const cks=await allCk();
+  const periodLabel=mode==='monthly'?`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`
+    :mode==='quarterly'?getCurrentQ()
+    :`${now.getFullYear()}`;
+  
+  ckData=cks.find(c=>c.type===mode&&c.period===periodLabel);
+  if(!ckData){
+    ckData={type:mode,period:periodLabel,createdAt:now.toISOString(),
+      people:ps.map(p=>({
+        pid:p.id,name:p.name,color:p.color,
+        beforeRel:getBeforeRel(p,mode),afterRel:p.relPersonal||'',
+        beforeRelB:getBeforeRelB(p,mode),afterRelB:p.relBusiness||'',
+        beforeLevel:getBeforeLevel(p,mode),afterLevel:p.levelTarget||'',
+        beforeMotiv:getBeforeMotiv(p,mode),afterMotiv:getCurrentMotiv(p),
+        feedback:'',goal:'',meetings:countMeetings(p,mode)
+      })),
+      aprr:{rr:'',p:'',a:''},summary:''
+    };
+  } else {
+    // Refresh after data from current person records
+    ckData.people.forEach(cp=>{
+      const p=ps.find(pp=>pp.id===cp.pid);
+      if(p){cp.afterRel=p.relPersonal||'';cp.afterRelB=p.relBusiness||'';cp.afterLevel=p.levelTarget||'';cp.afterMotiv=getCurrentMotiv(p);cp.meetings=countMeetings(p,mode);cp.name=p.name;cp.color=p.color}
+    });
+    // Add new people not yet in checkup
+    ps.forEach(p=>{
+      if(!ckData.people.find(cp=>cp.pid===p.id)){
+        ckData.people.push({pid:p.id,name:p.name,color:p.color,beforeRel:'',afterRel:p.relPersonal||'',beforeRelB:'',afterRelB:p.relBusiness||'',beforeLevel:getBeforeLevel(p,mode),afterLevel:p.levelTarget||'',beforeMotiv:'',afterMotiv:getCurrentMotiv(p),feedback:'',goal:'',meetings:countMeetings(p,mode)});
+      }
+    });
+  }
+  
+  const activePeople=ckData.people.filter(cp=>ps.find(p=>p.id===cp.pid&&(p.status||'active')==='active'));
+  const changedPeople=ckData.people.filter(cp=>cp.beforeLevel&&cp.afterLevel&&cp.beforeLevel!==cp.afterLevel);
+
+  app.innerHTML=`
+    <div style="margin-top:12px">
+      <!-- Mode tabs -->
+      <div class="stb" style="margin-bottom:8px">
+        <button class="${mode==='monthly'?'a':''}" onclick="S.checkupMode='monthly';render()">월간 체크업</button>
+        <button class="${mode==='quarterly'?'a':''}" onclick="S.checkupMode='quarterly';render()">분기 체크업</button>
+        <button class="${mode==='annual'?'a':''}" onclick="S.checkupMode='annual';render()">연간 체크업</button>
+      </div>
+
+      <div class="sc">
+        <div class="st">📋 ${mode==='monthly'?'월간':mode==='quarterly'?'분기':'연간'} 체크업 — ${periodLabel}</div>
+        <div style="font-size:11px;color:var(--mut);margin-bottom:10px">
+          파트너 ${activePeople.length}명 · 수준 변화 ${changedPeople.length}명
+        </div>
+
+        <!-- Partner before/after comparison -->
+        ${ckData.people.map((cp,ci)=>{
+          const levelChanged=cp.beforeLevel&&cp.afterLevel&&cp.beforeLevel!==cp.afterLevel;
+          const levelUp=levelChanged&&CLEVELS.indexOf(cp.afterLevel)>CLEVELS.indexOf(cp.beforeLevel);
+          return`
+          <div style="border:1px solid ${levelUp?'var(--pm)':'var(--bdr)'};border-radius:10px;padding:12px;margin-bottom:8px;background:${levelUp?'var(--g1)':'white'}">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <div style="width:28px;height:28px;border-radius:7px;background:${cp.color||'var(--pm)'};color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">${(cp.name||'?')[0]}</div>
+              <div style="flex:1">
+                <span style="font-size:13px;font-weight:700">${esc(cp.name)}</span>
+                ${levelUp?'<span style="font-size:10px;color:var(--pm);margin-left:4px">🎉 수준 향상</span>':''}
+              </div>
+              <span style="font-size:10px;color:var(--mut)">만남 ${cp.meetings||0}회</span>
+            </div>
+            
+            <!-- Before/After comparison -->
+            <div style="display:flex;gap:4px;margin-bottom:6px">
+              <div style="flex:1;text-align:center">
+                <div style="font-size:9px;color:var(--mut);margin-bottom:2px">구분</div>
+              </div>
+              <div style="flex:2;text-align:center">
+                <div style="font-size:9px;color:var(--mut)">관계(개/사)</div>
+              </div>
+              <div style="flex:2;text-align:center">
+                <div style="font-size:9px;color:var(--mut)">수준</div>
+              </div>
+              <div style="flex:1;text-align:center">
+                <div style="font-size:9px;color:var(--mut)">동기</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:4px;margin-bottom:2px;background:var(--bg);border-radius:6px;padding:4px">
+              <div style="flex:1;text-align:center;font-size:10px;font-weight:600;color:var(--mut)">전</div>
+              <div style="flex:2;text-align:center;font-size:10px">${esc(cp.beforeRel||'-')}/${esc(cp.beforeRelB||'-')}</div>
+              <div style="flex:2;text-align:center;font-size:10px">${esc(cp.beforeLevel||'-')}</div>
+              <div style="flex:1;text-align:center;font-size:10px">${esc(cp.beforeMotiv||'-')}</div>
+            </div>
+            <div style="display:flex;gap:4px;margin-bottom:8px;background:var(--blu);border-radius:6px;padding:4px">
+              <div style="flex:1;text-align:center;font-size:10px;font-weight:600;color:#1565C0">후</div>
+              <div style="flex:2;text-align:center;font-size:10px;font-weight:600">${esc(cp.afterRel||'-')}/${esc(cp.afterRelB||'-')}</div>
+              <div style="flex:2;text-align:center;font-size:10px;font-weight:700;color:${levelUp?'var(--pm)':'inherit'}">${esc(cp.afterLevel||'-')}</div>
+              <div style="flex:1;text-align:center;font-size:10px;font-weight:600">${esc(cp.afterMotiv||'-')}</div>
+            </div>
+
+            <div class="fl"><label class="fl-l">Feed Back</label>
+              <textarea rows="2" placeholder="이 파트너에 대한 피드백" onchange="ckData.people[${ci}].feedback=this.value">${esc(cp.feedback)}</textarea>
+            </div>
+            <div class="fl" style="margin-bottom:0"><label class="fl-l">다음 목표</label>
+              <textarea rows="1" placeholder="다음 기간 목표" onchange="ckData.people[${ci}].goal=this.value">${esc(cp.goal)}</textarea>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <!-- APRR Summary -->
+      <div class="sc">
+        <div class="st">📊 APRR 구분 정리</div>
+        <div class="fl"><label class="fl-l">신규 (RR) — 이번 ${mode==='monthly'?'달':mode==='quarterly'?'분기':'연도'} 신규 활동</label>
+          <textarea rows="2" placeholder="신규 관련 활동 정리" onchange="ckData.aprr.rr=this.value">${esc(ckData.aprr.rr)}</textarea>
+        </div>
+        <div class="fl"><label class="fl-l">생산성 (P) — 생산성 관련 성과</label>
+          <textarea rows="2" class="bo" placeholder="생산성 관련 활동 정리" onchange="ckData.aprr.p=this.value">${esc(ckData.aprr.p)}</textarea>
+        </div>
+        <div class="fl"><label class="fl-l">활동성 (A) — 활동성 관련 성과</label>
+          <textarea rows="2" class="bb" placeholder="활동성 관련 활동 정리" onchange="ckData.aprr.a=this.value">${esc(ckData.aprr.a)}</textarea>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="sc">
+        <div class="st">📝 Summary</div>
+        <textarea rows="4" style="background:var(--g1)" placeholder="이번 ${mode==='monthly'?'달':mode==='quarterly'?'분기':'연도'} 전체 종합 정리" onchange="ckData.summary=this.value">${esc(ckData.summary)}</textarea>
+      </div>
+
+      <button class="ba" onclick="saveCheckup()">💾 체크업 저장</button>
+      <div style="height:20px"></div>
+    </div>
+  `;
+}
+
+function getCurrentQ(){
+  const fy=fyCalc(new Date());
+  return`FY${fy.fyYear} Q${fy.q}`;
+}
+
+function getBeforeLevel(p,mode){
+  if(!p.archives||!p.archives.length)return p.levelTarget||'';
+  const last=p.archives[p.archives.length-1];
+  return last.levelTarget||'';
+}
+function getBeforeRel(p,mode){
+  if(!p.archives||!p.archives.length)return p.relPersonal||'';
+  const last=p.archives[p.archives.length-1];
+  return last.relPersonal||p.relPersonal||'';
+}
+function getBeforeRelB(p,mode){
+  if(!p.archives||!p.archives.length)return p.relBusiness||'';
+  const last=p.archives[p.archives.length-1];
+  return last.relBusiness||p.relBusiness||'';
+}
+function getBeforeMotiv(p,mode){
+  // Get motivation stage from archived data
+  if(!p.archives||!p.archives.length)return '';
+  const last=p.archives[p.archives.length-1];
+  // Try to find from last month's cards
+  const lastMo=last.months?last.months[last.months.length-1]:null;
+  if(lastMo&&lastMo.cards){
+    const lastCard=lastMo.cards.filter(c=>c.targetName).pop();
+    if(lastCard&&lastCard.processSteps&&lastCard.processSteps.length) return lastCard.processSteps[lastCard.processSteps.length-1];
+  }
+  return '';
+}
+function getCurrentMotiv(p){
+  // Get current motivation from latest card
+  const months=p.months||[];
+  for(let i=months.length-1;i>=0;i--){
+    const cards=(months[i].cards||[]).filter(c=>c.targetName);
+    if(cards.length){
+      const last=cards[cards.length-1];
+      if(last.processSteps&&last.processSteps.length) return last.processSteps[last.processSteps.length-1];
+    }
+  }
+  return '';
+}
+function countMeetings(p,mode){
+  const months=p.months||[];
+  let count=0;
+  const range=mode==='monthly'?1:mode==='quarterly'?3:12;
+  for(let i=0;i<Math.min(range,months.length);i++){
+    const mo=months[i];
+    if(!mo.tracker)continue;
+    for(let d=1;d<=31;d++){
+      if(mo.tracker['pv_'+d])count++;
+    }
+  }
+  return count;
+}
+
+async function saveCheckup(){
+  if(!ckData)return;
+  ckData.updatedAt=new Date().toISOString();
+  await savCk(ckData);
+  // Update ckData with returned id if new
+  const cks=await allCk();
+  const found=cks.find(c=>c.type===ckData.type&&c.period===ckData.period);
+  if(found) ckData.id=found.id;
+  toast('체크업이 저장되었습니다');
+}
+
+// ─── Settings ───
+async function rSettings(){
+  const ps=await all();
+  app.innerHTML=`
+    <div style="margin-top:12px">
+      <div class="sc">
+        <div class="st">⚙️ 설정</div>
+        <div style="font-size:13px;color:var(--mut);margin-bottom:12px">데이터 관리</div>
+        <button class="ba" onclick="expAll()" style="margin-bottom:8px">📥 전체 데이터 백업 (JSON)</button>
+        <label class="ba" style="display:block;text-align:center;cursor:pointer;margin-bottom:8px">
+          📤 데이터 복원 (v4 JSON)
+          <input type="file" accept=".json" style="display:none" onchange="impAll(event)">
+        </label>
+        <label class="ba" style="display:block;text-align:center;cursor:pointer;margin-bottom:8px;background:linear-gradient(135deg,#1565C0,#0D47A1)">
+          🔄 이전 버전(v2·v3) 데이터 가져오기
+          <input type="file" accept=".json" style="display:none" onchange="impLegacy(event)">
+        </label>
+        <button class="bd" onclick="clearAll()">🗑 전체 데이터 초기화</button>
+      </div>
+      <div class="sc">
+        <div class="st">📋 작성 가이드</div>
+        <div style="font-size:12px;line-height:1.8;color:var(--txt)">
+          <div>① <b>파트너 탭</b>에서 관리 대상을 추가합니다 (최대 60명)</div>
+          <div>② 각 파트너별 <b>분기(3개월) 목표</b>를 설정합니다</div>
+          <div>③ 일간 트래커에서 활동을 <b>체크</b>하면 도전카드 자동 생성</div>
+          <div>④ <b>월간 스케줄</b>에서 전월·당월·익월 만남을 확인합니다</div>
+          <div>⑤ 만남 전후로 <b>도전카드</b>를 작성합니다 (월 최대 31장)</div>
+          <div>⑥ <b>주간/월간 피드백</b>으로 성장을 추적합니다</div>
+          <div>⑦ <b>체크업</b>으로 월간/분기/연간 전체 파트너를 조감합니다</div>
+          <div>⑧ 분기 종료 후 <b>새 분기 시작</b>으로 자동 이월합니다</div>
+          <div style="margin-top:8px;font-size:11px;color:var(--mut)">
+            ✓ A그룹(집중 관리): 도전카드 작성 권장<br>
+            ✓ B그룹(일반 관리): 월간 목표만으로도 OK<br>
+            ✓ 복제 관점: 파트너가 보고 따라할 수 있는가?
+          </div>
+        </div>
+      </div>
+      <div class="sc">
+        <div style="font-size:11px;color:var(--mut);text-align:center">
+          도전카드 관리 v4.0<br>
+          저장된 파트너: ${ps.length}명<br>
+          데이터는 이 기기에만 저장됩니다
+        </div>
+      </div>
+      <div style="height:20px"></div>
+    </div>
+  `;
+}
+
+async function expAll(){
+  const ps=await all();
+  const blob=new Blob([JSON.stringify(ps,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`도전카드_백업_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  toast('백업 파일 다운로드 완료');
+}
+
+async function impAll(e){
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const t=await f.text();const rs=JSON.parse(t);
+    for(const r of rs){delete r.id;await sav(r)}
+    toast(`${rs.length}명 복원 완료`);render();
+  }catch(e){alert('파일 형식 오류')}
+}
+
+async function impLegacy(e){
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const t=await f.text();const rs=JSON.parse(t);
+    let count=0;
+    for(const old of rs){
+      // Detect if it's already v4 format (has months array)
+      if(old.months&&Array.isArray(old.months)){
+        delete old.id;await sav(old);count++;continue;
+      }
+      
+      // Convert old format to v4
+      const fy=fyCalc(new Date());
+      const qms=fyQuarterMonths(fy.fyYear,fy.q);
+      
+      // Build first month from old data
+      const m1=mkMonth(old.yearMonth||`${qms[0].y}-${String(qms[0].m).padStart(2,'0')}`);
+      m1.goalLong=old.goalLong||'';
+      m1.goalMid=old.goalMid||'';
+      m1.goalShort=old.goalShort||'';
+      m1.currentStatus=old.currentStatus||'';
+      m1.week1=old.week1||'';m1.week2=old.week2||'';
+      m1.week3=old.week3||'';m1.week4=old.week4||'';
+      m1.myFeedback=old.myFeedback||'';
+      m1.sponsorFeedback=old.sponsorFeedback||'';
+      m1.tracker=old.tracker||{};
+      
+      // Convert old cards (remove relationship fields that moved to person level)
+      const oldCards=(old.cards||[]).map(c=>{
+        const nc=Object.assign({},c);
+        if(!nc.processSteps) nc.processSteps=[];
+        if(!nc.dailyGoal) nc.dailyGoal='';
+        if(!nc.dailyWhy) nc.dailyWhy='';
+        if(!nc.dailyAchieved) nc.dailyAchieved='';
+        if(!nc._autoActivity) nc._autoActivity=false;
+        return nc;
+      });
+      m1.cards=oldCards.length?oldCards:[mkCard(m1)];
+      
+      // Extract relationship from first card if available
+      let relP='',relB='',lvlT='',lvlM='';
+      const firstCardWithData=oldCards.find(c=>c.relPersonal||c.levelTarget);
+      if(firstCardWithData){
+        relP=firstCardWithData.relPersonal||'';
+        relB=firstCardWithData.relBusiness||'';
+        lvlT=firstCardWithData.levelTarget||'';
+        lvlM=firstCardWithData.levelMe||'';
+      }
+      // Also check person-level fields (v3.5 had these)
+      relP=old.relPersonal||relP;
+      relB=old.relBusiness||relB;
+      lvlT=old.levelTarget||lvlT;
+      lvlM=old.levelMe||lvlM;
+      
+      const m2=mkMonth(`${qms[1].y}-${String(qms[1].m).padStart(2,'0')}`);
+      const m3=mkMonth(`${qms[2].y}-${String(qms[2].m).padStart(2,'0')}`);
+      
+      const newPerson={
+        name:old.name||'',
+        group:old.group||'A',
+        status:old.status||'active',
+        relPersonal:relP,relBusiness:relB,
+        levelTarget:lvlT,levelMe:lvlM,
+        quarter:`FY${fy.fyYear} Q${fy.q}`,
+        months:[m1,m2,m3],
+        archives:[],
+        activeMonth:0,
+        color:old.color||COLORS[Math.floor(Math.random()*COLORS.length)]
+      };
+      
+      await sav(newPerson);
+      count++;
+    }
+    toast(`✓ ${count}명 변환 완료 (이전 버전 → v4)`);
+    render();
+  }catch(err){
+    alert('변환 오류: '+err.message);
+  }
+}
+
+async function clearAll(){
+  if(!confirm('모든 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'))return;
+  const ps=await all();
+  for(const p of ps)await del(p.id);
+  toast('전체 데이터 초기화 완료');render();
+}
+
+// ─── Init ───
+updTabs();render();
+</script>
+</body>
+</html>
