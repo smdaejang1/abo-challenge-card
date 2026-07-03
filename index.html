@@ -118,6 +118,8 @@ async function delCk(id){const db=await odb();return new Promise((r,j)=>{const t
 
 // ─── Constants ───
 const CLEVELS=['제로소비자','소비자','소비자1','소비자2','소비자3'];
+const CLEVEL_DESC={'제로소비자':'제품 X','소비자':'제품 O · 전달 X','소비자1':'제품 O · 전달 O','소비자2':'소비자1 후원','소비자3':'소비자2 후원'};
+const RELSTAGE_DESC={1:'관심',2:'친한',3:'신뢰',4:'함께/승-승'};
 const PSTEPS=['needs','준비','적용','결과'];
 const COMMS=['1류:이해','2류:설득','3류:강요','4류:구박'];
 const STATUSES=[{id:'active',label:'활동 중',icon:'🟢'},{id:'hold',label:'보류',icon:'🟡'},{id:'grad',label:'졸업(독립)',icon:'🎓'}];
@@ -536,13 +538,13 @@ async function rPerson(){
         <div class="fl f1"><label class="fl-l">개인적 관계</label>
           <select onchange="S.person.relPersonal=this.value">
             <option value="">선택</option>
-            ${[1,2,3,4].map(n=>`<option value="${n}단계"${p.relPersonal===n+'단계'?' selected':''}>${n}단계</option>`).join('')}
+            ${[1,2,3,4].map(n=>`<option value="${n}단계"${p.relPersonal===n+'단계'?' selected':''}>${n}단계 · ${RELSTAGE_DESC[n]}</option>`).join('')}
           </select>
         </div>
         <div class="fl f1"><label class="fl-l">사업적 관계</label>
           <select onchange="S.person.relBusiness=this.value">
             <option value="">선택</option>
-            ${[1,2,3,4].map(n=>`<option value="${n}단계"${p.relBusiness===n+'단계'?' selected':''}>${n}단계</option>`).join('')}
+            ${[1,2,3,4].map(n=>`<option value="${n}단계"${p.relBusiness===n+'단계'?' selected':''}>${n}단계 · ${RELSTAGE_DESC[n]}</option>`).join('')}
           </select>
         </div>
       </div>
@@ -550,13 +552,13 @@ async function rPerson(){
         <div class="fl f1"><label class="fl-l">상대 수준</label>
           <select onchange="S.person.levelTarget=this.value">
             <option value="">선택</option>
-            ${CLEVELS.map(l=>`<option value="${l}"${p.levelTarget===l?' selected':''}>${l}</option>`).join('')}
+            ${CLEVELS.map(l=>`<option value="${l}"${p.levelTarget===l?' selected':''}>${l} · ${CLEVEL_DESC[l]}</option>`).join('')}
           </select>
         </div>
         <div class="fl f1"><label class="fl-l">나의 역할 (목표)</label>
           <select onchange="S.person.levelMe=this.value">
             <option value="">선택</option>
-            ${CLEVELS.map(l=>`<option value="${l}"${p.levelMe===l?' selected':''}>${l}</option>`).join('')}
+            ${CLEVELS.map(l=>`<option value="${l}"${p.levelMe===l?' selected':''}>${l} · ${CLEVEL_DESC[l]}</option>`).join('')}
           </select>
         </div>
       </div>
@@ -570,16 +572,52 @@ async function rPerson(){
       </button>`).join('')}
     </div>
 
-    <div class="sc" onclick="S.view='monthly';render()" style="cursor:pointer">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div class="st" style="margin-bottom:0">📊 ${monthLabels[mi]} 목표</div>
-        <span style="font-size:12px;color:${mo.goalShort?'var(--pm)':'var(--mut)'};font-weight:600">${mo.goalShort?'✓ 작성됨':'미작성 →'}</span>
+    <div onclick="S.view='monthly';render()" style="
+      cursor:pointer;
+      margin-bottom:12px;
+      background:${mo.goalShort?'#1B2A4A':'#fff'};
+      border:2px solid ${mo.goalShort?'#1B2A4A':'#E0E0E0'};
+      border-radius:14px;
+      padding:16px 18px;
+      box-shadow:0 2px 8px rgba(27,42,74,0.10);
+      transition:box-shadow 0.15s;
+    ">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${mo.goalShort?'10px':'0'}">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">🎯</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:${mo.goalShort?'#fff':'#1B2A4A'}">${monthLabels[mi]} 월간 목표</div>
+            <div style="font-size:10px;color:${mo.goalShort?'#90CAF9':'var(--mut)'};margin-top:1px">${mo.ym||'년/월 미설정'}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${mo.goalShort
+            ?`<span style="font-size:11px;font-weight:700;background:#2E7D32;color:#fff;padding:3px 10px;border-radius:12px">✓ 작성됨</span>`
+            :`<span style="font-size:11px;font-weight:700;background:#E65100;color:#fff;padding:3px 10px;border-radius:12px">미작성</span>`
+          }
+          <span style="font-size:18px;color:${mo.goalShort?'#90CAF9':'var(--mut)'}">→</span>
+        </div>
       </div>
-      <div class="fl" style="margin-top:6px;margin-bottom:0">
-        <label class="fl-l">년/월</label>
-        <input type="month" value="${esc(mo.ym)}" onclick="event.stopPropagation()" onchange="S.person.months[${mi}].ym=this.value;render()">
+      ${mo.goalShort||mo.goalMid||mo.goalLong?`
+      <div style="display:flex;flex-direction:column;gap:5px">
+        ${mo.goalLong?`<div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:9px;font-weight:700;background:#F9A825;color:#fff;padding:2px 5px;border-radius:4px;white-space:nowrap">익익월</span>
+          <span style="font-size:11px;color:#FFE082;font-weight:600">${esc(mo.goalLong).substring(0,30)}${mo.goalLong.length>30?'...':''}</span>
+        </div>`:''}
+        ${mo.goalMid?`<div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:9px;font-weight:700;background:#FB8C00;color:#fff;padding:2px 5px;border-radius:4px;white-space:nowrap">익월</span>
+          <span style="font-size:11px;color:#FFCC80;font-weight:600">${esc(mo.goalMid).substring(0,30)}${mo.goalMid.length>30?'...':''}</span>
+        </div>`:''}
+        ${mo.goalShort?`<div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:9px;font-weight:700;background:#1E88E5;color:#fff;padding:2px 5px;border-radius:4px;white-space:nowrap">당월</span>
+          <span style="font-size:11px;color:#90CAF9;font-weight:600">${esc(mo.goalShort).substring(0,30)}${mo.goalShort.length>30?'...':''}</span>
+        </div>`:''}
+      </div>`
+      :`<div style="font-size:12px;color:var(--mut);margin-top:4px">탭하여 이번 달 목표를 설정하세요</div>`}
+      <div style="margin-top:10px" onclick="event.stopPropagation()">
+        <label style="font-size:11px;color:${mo.goalShort?'#90CAF9':'var(--mut)'};margin-bottom:4px;display:block">년 / 월</label>
+        <input type="month" value="${esc(mo.ym)}" onchange="S.person.months[${mi}].ym=this.value;render()" style="font-size:13px;padding:6px 10px;border-radius:8px;border:1.5px solid ${mo.goalShort?'#3A5A8A':'#E0E0E0'};background:${mo.goalShort?'#243A5A':'#fff'};color:${mo.goalShort?'#fff':'#1B2A4A'};width:100%">
       </div>
-      ${mo.goalShort?`<div style="font-size:12px;color:var(--mut);margin-top:4px">당월: ${esc(mo.goalShort).substring(0,40)}${mo.goalShort.length>40?'...':''}</div>`:''}
     </div>
 
     <div class="sc">
@@ -879,15 +917,11 @@ function rArchive(){
 
 // ─── Monthly Goal Definitions ───
 const MONTHLY_GOALS=[
-  {id:'g1',label:'제품 소개',desc:'제품을 처음 알려주는 단계',levels:['제로소비자','소비자'],color:'#1565C0'},
-  {id:'g2',label:'제품 체험',desc:'직접 써보게 하는 단계',levels:['제로소비자','소비자'],color:'#2E7D32'},
-  {id:'g3',label:'제품 체험 공유',desc:'체험 후 주변에 알리는 단계',levels:['제로소비자','소비자'],color:'#00838F'},
-  {id:'g4',label:'제품 전달',desc:'정기적으로 제품을 전달하는 단계',levels:['제로소비자','소비자'],color:'#AD1457'},
-  {id:'g5',label:'3% 달성',desc:'소비자1 → 소비자2 전환',levels:['제로소비자','소비자','소비자1'],color:'#E65100'},
-  {id:'g6',label:'3% 유지 + 3명 이상 제품 소개',desc:'소비자2 수준 안정화',levels:['제로소비자','소비자','소비자1'],color:'#4527A0'},
-  {id:'g7',label:'3% 유지 + 3명 이상에게 제품 전달',desc:'소비자3 진입 준비',levels:['제로소비자','소비자','소비자1','소비자2'],color:'#BF360C'},
-  {id:'g8',label:'BF 달성',desc:'Bronze Foundation 달성',levels:['소비자1','소비자2','소비자3'],color:'#33691E'},
-  {id:'g9',label:'BB 달성',desc:'Bronze Builder 달성',levels:['소비자1','소비자2','소비자3'],color:'#1B5E20'},
+  {id:'g1',label:'제품 체험하기',desc:'제품을 직접 체험하게 하는 단계 — 제로소비자 → 소비자 전환',levels:['제로소비자','소비자'],color:'#1565C0'},
+  {id:'g2',label:'5가지 제품 체험하기',desc:'5가지 제품을 체험하게 하는 단계 — 소비자 → 소비자1 전환',levels:['제로소비자','소비자','소비자1'],color:'#2E7D32'},
+  {id:'g3',label:'3% 만들기',desc:'소비자1을 만들어주는 단계 — 제품 전달 후원',levels:['소비자','소비자1','소비자2'],color:'#E65100'},
+  {id:'g4',label:'스스로 3% 하기',desc:'본인이 직접 3% 달성하는 단계 — 소비자1 역할 실행',levels:['소비자1','소비자2','소비자3'],color:'#6A1B9A'},
+  {id:'g5',label:'3% 복제하기',desc:'소비자1이 소비자1을 만드는 단계 — 소비자2·3 후원',levels:['소비자2','소비자3'],color:'#BF360C'},
 ];
 
 // ─── Monthly View ───
@@ -927,44 +961,52 @@ function rMonthly(){
     <div class="sc">
       <div class="st">🎯 ${monthLabels[mi]} 월간 목표 (역산 구조)</div>
       <div class="fl"><label class="fl-l">년/월</label><input type="month" value="${esc(mo.ym)}" onchange="S.person.months[${mi}].ym=this.value;render()"></div>
-      <div class="fl"><label class="fl-l">① 현재 상황 (지금 어디에 있는가)</label><textarea rows="2" placeholder="대상과의 현재 관계, 사업 진행 상태를 팩트 기반으로 기술" onchange="S.person.months[${mi}].currentStatus=this.value">${esc(mo.currentStatus)}</textarea></div>
+      <div class="fl">
+        <label class="fl-l">① 현재 상황 (지금 어디에 있는가)</label>
+        ${(p.relPersonal||p.relBusiness||p.levelTarget||p.levelMe)?`
+        <div style="background:#1B2A4A;border-radius:10px;padding:10px;margin-bottom:8px">
+          <div style="font-size:10px;font-weight:700;color:#7A99BB;margin-bottom:6px;letter-spacing:0.5px">▸ 파트너 관계 · 수준</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${p.relPersonal?`<span style="background:#1565C0;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px">개인 ${esc(p.relPersonal)} · ${RELSTAGE_DESC[parseInt(p.relPersonal)]||''}</span>`:''}
+            ${p.relBusiness?`<span style="background:#00796B;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px">사업 ${esc(p.relBusiness)} · ${RELSTAGE_DESC[parseInt(p.relBusiness)]||''}</span>`:''}
+            ${p.levelTarget?`<span style="background:#E65100;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px">현재 ${esc(p.levelTarget)} · ${CLEVEL_DESC[p.levelTarget]||''}</span>`:''}
+            ${p.levelMe?`<span style="background:#6A1B9A;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px">목표 ${esc(p.levelMe)} · ${CLEVEL_DESC[p.levelMe]||''}</span>`:''}
+          </div>
+        </div>`:''}
+        <textarea rows="2" placeholder="최근 특이사항, 변화된 상황 등 추가 메모" onchange="S.person.months[${mi}].currentStatus=this.value">${esc(mo.currentStatus)}</textarea>
+      </div>
       
-      <div class="fl">
-        <label class="fl-l">② ${goalLabels.long}</label>
-        <div style="display:flex;gap:6px">
-          <div onclick="openGoalPicker(${mi},'long')" style="flex:none;width:42px;height:40px;background:var(--yel);border:1.5px solid #F9A825;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;color:#F57F17;flex-direction:column">📋<span style="font-size:8px">선택</span></div>
-          <textarea rows="2" class="by" style="flex:1" placeholder="탭하여 목표 선택 또는 직접 입력" onchange="S.person.months[${mi}].goalLong=this.value">${esc(mo.goalLong)}</textarea>
-        </div>
-      </div>
-      <div class="fl">
-        <label class="fl-l">③ ${goalLabels.mid}</label>
-        <div style="display:flex;gap:6px">
-          <div onclick="openGoalPicker(${mi},'mid')" style="flex:none;width:42px;height:40px;background:var(--org);border:1.5px solid #FB8C00;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;color:#E65100;flex-direction:column">📋<span style="font-size:8px">선택</span></div>
-          <textarea rows="2" class="bo" style="flex:1" placeholder="탭하여 목표 선택 또는 직접 입력" onchange="S.person.months[${mi}].goalMid=this.value">${esc(mo.goalMid)}</textarea>
-        </div>
-      </div>
-      <div class="fl">
-        <label class="fl-l">④ ${goalLabels.short}</label>
-        <div style="display:flex;gap:6px">
-          <div onclick="openGoalPicker(${mi},'short')" style="flex:none;width:42px;height:40px;background:var(--blu);border:1.5px solid #1E88E5;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;color:#1565C0;flex-direction:column">📋<span style="font-size:8px">선택</span></div>
-          <textarea rows="2" class="bb" style="flex:1" placeholder="탭하여 목표 선택 또는 직접 입력" onchange="S.person.months[${mi}].goalShort=this.value">${esc(mo.goalShort)}</textarea>
-        </div>
-      </div>
-    </div>
-
-    <div class="sc">
-      <div class="st">📅 주간 목표 & 피드백</div>
-      ${[1,2,3,4].map(w=>`
-        <div style="background:var(--bg);border-radius:10px;padding:10px;margin-bottom:8px">
-          <div style="font-size:12px;font-weight:700;color:var(--pm);margin-bottom:6px">${w}주차</div>
-          <div class="fl"><label class="fl-l">주간 목표</label><input type="text" placeholder="${w}주차 목표" value="${esc(mo['week'+w]||'')}" onchange="S.person.months[${mi}].week${w}=this.value"></div>
-          <div class="fl"><label class="fl-l">주간 피드백 (잘한 것 · 보완할 것)</label><textarea rows="2" placeholder="이번 주 성찰 — 스폰서와 소통 후 기록" onchange="S.person.months[${mi}].wkFb${w}=this.value">${esc(mo['wkFb'+w]||'')}</textarea></div>
-        </div>
-      `).join('')}
+      ${['long','mid','short'].map((type,ti)=>{
+        const num=['②','③','④'][ti];
+        const lbl=[goalLabels.long,goalLabels.mid,goalLabels.short][ti];
+        const cls=['by','bo','bb'][ti];
+        const curVal=[mo.goalLong,mo.goalMid,mo.goalShort][ti];
+        const field=['goalLong','goalMid','goalShort'][ti];
+        const borderColor=['#F9A825','#FB8C00','#1E88E5'][ti];
+        const btnColors=['#F57F17','#E65100','#1565C0'];
+        const btnBg=['#FFF8E1','#FFF3E0','#E3F2FD'];
+        return`<div class="fl">
+          <label class="fl-l">${num} ${lbl}</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">
+            ${MONTHLY_GOALS.map(g=>{
+              const isSelected=curVal===g.label;
+              return`<button onclick="setMonthlyGoal('${type}','${g.label}',${mi})" style="
+                padding:7px 12px;border-radius:20px;font-size:12px;font-weight:700;
+                cursor:pointer;border:2px solid ${isSelected?g.color:'#E0E0E0'};
+                background:${isSelected?g.color:'#fff'};
+                color:${isSelected?'#fff':g.color};
+                transition:all 0.15s;white-space:nowrap
+              ">${g.label}</button>`;
+            }).join('')}
+          </div>
+          <textarea rows="2" class="${cls}" placeholder="직접 입력 또는 위에서 선택" onchange="S.person.months[${mi}].${field}=this.value">${esc(curVal)}</textarea>
+        </div>`;
+      }).join('')}
     </div>
 
     <div class="sc">
       <div class="st">✅ 일간 활동 트래커</div>
+      <div style="font-size:11px;color:var(--mut);margin-bottom:8px">📌 매일 활동을 먼저 체크하세요. 체크하면 도전카드가 자동 생성되고, 주간 현황이 자동으로 집계됩니다.</div>
       <div class="trk-w">
         <table class="trk-t">
           <thead><tr><th style="width:24px"></th><th style="width:30px"></th>${(function(){
@@ -998,7 +1040,76 @@ function rMonthly(){
     </div>
 
     <div class="sc">
+      <div class="st">📅 주간 현황 & 피드백</div>
+      <div style="font-size:11px;color:var(--mut);margin-bottom:10px">📊 일간 트래커 기반으로 자동 집계됩니다. 주말에 피드백만 입력하세요.</div>
+      ${(function(){
+        const tracker=mo.tracker||{};
+        const [yy,mm]=(mo.ym||'').split('-').map(Number);
+        // 주차별 날짜 범위 계산
+        const weekRanges=[[1,7],[8,14],[15,21],[22,31]];
+        return weekRanges.map((rng,wi)=>{
+          const w=wi+1;
+          // 해당 주차 날짜들 중 실제 존재하는 날
+          const days=Array.from({length:rng[1]-rng[0]+1},(_,i)=>rng[0]+i).filter(d=>{
+            if(!yy||!mm)return true;
+            const dt=new Date(yy,mm-1,d);
+            return dt.getMonth()===mm-1;
+          });
+          // 활동 집계
+          const summary=[];
+          ACTS.forEach(a=>{
+            if(a.t==='chk'){
+              const cnt=days.filter(d=>tracker[a.id+'_'+d]).length;
+              if(cnt>0) summary.push(`${a.s} ${cnt}건`);
+            } else {
+              const total=days.reduce((s,d)=>s+(parseInt(tracker[a.id+'_'+d])||0),0);
+              if(total>0) summary.push(`${a.s} ${total}`);
+            }
+          });
+          // 도전카드 연결된 날
+          const cardDays=days.filter(d=>ACTS.some(a=>a.t==='chk'&&tracker[a.id+'_'+d]));
+          const hasSummary=summary.length>0;
+          return`<div style="background:var(--bg);border-radius:10px;padding:12px;margin-bottom:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:12px;font-weight:700;color:var(--pm)">${w}주차 (${rng[0]}일~${Math.min(rng[1],days[days.length-1]||rng[1])}일)</div>
+              ${hasSummary?`<div style="font-size:10px;color:var(--pm);font-weight:600">활동 ${cardDays.length}일</div>`:`<div style="font-size:10px;color:var(--mut)">활동 없음</div>`}
+            </div>
+            ${hasSummary
+              ?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
+                  ${summary.map(s=>`<span style="background:var(--pm);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px">${s}</span>`).join('')}
+                </div>`
+              :`<div style="font-size:11px;color:var(--mut);margin-bottom:8px">트래커 활동을 먼저 입력하세요</div>`
+            }
+            <div class="fl" style="margin-bottom:0">
+              <label class="fl-l">주간 피드백 (잘한 것 · 보완할 것)</label>
+              <textarea rows="2" placeholder="이번 주 성찰 — 주말에 스폰서와 소통 후 기록" onchange="S.person.months[${mi}].wkFb${w}=this.value">${esc(mo['wkFb'+w]||'')}</textarea>
+            </div>
+          </div>`;
+        }).join('');
+      })()}
+    </div>
+
+    <div class="sc">
       <div class="st">📊 월간 피드백</div>
+
+      ${(mo.goalLong||mo.goalMid||mo.goalShort)?`
+      <div style="background:#1B2A4A;border-radius:10px;padding:12px;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:#7A99BB;margin-bottom:8px;letter-spacing:0.5px">▸ 이번 달 설정 목표</div>
+        ${mo.goalLong?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="font-size:10px;font-weight:700;background:#F9A825;color:#fff;padding:2px 6px;border-radius:4px;white-space:nowrap">익익월</span>
+          <span style="font-size:12px;color:#FFE082;font-weight:600">${esc(mo.goalLong)}</span>
+        </div>`:''}
+        ${mo.goalMid?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="font-size:10px;font-weight:700;background:#FB8C00;color:#fff;padding:2px 6px;border-radius:4px;white-space:nowrap">익월</span>
+          <span style="font-size:12px;color:#FFCC80;font-weight:600">${esc(mo.goalMid)}</span>
+        </div>`:''}
+        ${mo.goalShort?`<div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;font-weight:700;background:#1E88E5;color:#fff;padding:2px 6px;border-radius:4px;white-space:nowrap">당월</span>
+          <span style="font-size:12px;color:#90CAF9;font-weight:600">${esc(mo.goalShort)}</span>
+        </div>`:''}
+      </div>`
+      :`<div style="background:var(--bg);border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;color:var(--mut);text-align:center">월간 목표가 설정되지 않았습니다 ↑ 위에서 먼저 설정하세요</div>`}
+
       <div class="fl"><label class="fl-l">이번 달 핵심 성과</label><textarea rows="2" style="background:var(--g1)" placeholder="이번 달 가장 의미 있었던 성과" onchange="S.person.months[${mi}].monthFbAchieve=this.value">${esc(mo.monthFbAchieve)}</textarea></div>
       <div class="fl"><label class="fl-l">보완할 점</label><textarea rows="2" style="background:var(--org)" placeholder="다음 달에 개선할 부분" onchange="S.person.months[${mi}].monthFbImprove=this.value">${esc(mo.monthFbImprove)}</textarea></div>
       <div class="fl"><label class="fl-l">다음 달 최우선 과제</label><textarea rows="2" style="background:var(--blu)" placeholder="다음 달 반드시 해야 할 한 가지" onchange="S.person.months[${mi}].monthFbNext=this.value">${esc(mo.monthFbNext)}</textarea></div>
@@ -1145,7 +1256,50 @@ function updateCardActivities(card,dayNum){
   if(allLabels.length>0&&(!card.dailyGoal||card._autoActivity)){
     card.dailyGoal=allLabels.join(' | ');
     card._autoActivity=true;
+
+    // Why & How 자동 구조화 (트래커 항목 순서대로 개별 추출)
+    const allItems=[...deliveryLabels,...supportLabels]
+      .map(s=>s.replace(/PV\s*\d*/,'').trim())
+      .filter(s=>s&&s.trim()!=='');
+    if(allItems.length>0){
+      // Why: 비어있거나 _autoActivity 카드면 항상 갱신
+      if(!card.dailyWhy||card.dailyWhy.trim()===''||card._autoActivity){
+        card.dailyWhy=allItems.map((it,i)=>`${i+1}. ${it}:`).join('\n');
+      }
+      // How: 비어있거나 이전 피드백만 있거나 _autoActivity면 갱신
+      const howPrefix=card.how&&card.how.startsWith('[이전 피드백]')?card.how+'\n\n':'';
+      if(!card.how||card.how.trim()===''||card.how.startsWith('[이전 피드백]')||card._autoActivity){
+        card.how=howPrefix+allItems.map((it,i)=>`${i+1}. ${it}:`).join('\n');
+      }
+    }
   }
+}
+
+// What 항목 기반으로 Why/How 구조 자동 생성
+function autoFillWhyHow(whatVal){
+  const card=am()?.cards[S.cardIdx];
+  if(!card)return;
+  // 이모지·기호 제거 후 항목 추출 (| 또는 , 구분)
+  const raw=whatVal.replace(/📦|🤝|🎯/g,'').trim();
+  const items=raw.split(/[|,]/).map(s=>s.replace(/^\d+\.\s*/,'').trim()).filter(Boolean);
+  if(items.length===0)return;
+
+  // Why: 이미 내용이 있으면 덮어쓰지 않음
+  if(!card.dailyWhy||card.dailyWhy.trim()===''){
+    const whyText=items.map((it,i)=>`${i+1}. ${it}:`).join('\n');
+    card.dailyWhy=whyText;
+    const whyEl=document.getElementById('why-textarea');
+    if(whyEl){whyEl.value=whyText;whyEl.rows=Math.max(2,items.length+1);}
+  }
+  // How: 이미 내용이 있으면 덮어쓰지 않음
+  if(!card.how||card.how.trim()===''||card.how.startsWith('[이전 피드백]')){
+    const prefix=card.how&&card.how.startsWith('[이전 피드백]')?card.how+'\n\n':'';
+    const howText=prefix+items.map((it,i)=>`${i+1}. ${it}:`).join('\n');
+    card.how=howText;
+    const howEl=document.getElementById('how-textarea');
+    if(howEl){howEl.value=howText;howEl.rows=Math.max(4,items.length+2);}
+  }
+  save();
 }
 
 function scheduleNext(cardIdx){
@@ -1184,13 +1338,15 @@ function rCard(){
   if(t===0){
     // Get activities for this card's date
     const trkActs=cardDay>0?ACTS.map(a=>({...a,checked:!!((mo.tracker||{})[a.id+'_'+cardDay])})):[];
-    
+    const mo2=am();
+    const hasMonthly=mo2.goalLong||mo2.goalMid||mo2.goalShort;
+    const synced=c.goalLong===mo2.goalLong&&c.goalMid===mo2.goalMid&&c.goalShort===mo2.goalShort;
     tc=`
       <div class="sc">
         <div class="st">📝 도전카드 ${S.cardIdx+1}</div>
         <div class="rw"><div class="fl f1"><label class="fl-l">일자</label><input type="date" value="${esc(c.date)}" onchange="uc('date',this.value)"></div><div class="fl f2"><label class="fl-l">대상 이름</label><input type="text" placeholder="이름" value="${esc(c.targetName)}" onchange="uc('targetName',this.value)"></div></div>
         <div class="fl"><label class="fl-l">구분 (APRR)</label><div class="tg">${['신','생','활'].map(v=>`<button class="tb ${c.category===v?'a':''}" onclick="uc('category','${v}')">${v==='신'?'신(신규·RR)':v==='생'?'생(생산성·P)':'활(활동성·A)'}</button>`).join('')}</div></div>
-        ${S.person.relPersonal||S.person.levelTarget?`<div style="background:var(--g1);border-radius:8px;padding:8px;margin-top:4px;font-size:11px;color:var(--p)">관계: 개인${esc(S.person.relPersonal||'?')} / 사업${esc(S.person.relBusiness||'?')} &nbsp;|&nbsp; ${esc(S.person.levelTarget||'?')} → ${esc(S.person.levelMe||'?')}</div>`:''}
+        ${S.person.relPersonal||S.person.levelTarget?`<div style="background:var(--g1);border-radius:8px;padding:8px;margin-top:4px;font-size:11px;color:var(--p)">관계: 개인${esc(S.person.relPersonal||'?')}${S.person.relPersonal?'('+RELSTAGE_DESC[parseInt(S.person.relPersonal)]+')':''} / 사업${esc(S.person.relBusiness||'?')}${S.person.relBusiness?'('+RELSTAGE_DESC[parseInt(S.person.relBusiness)]+')':''} &nbsp;|&nbsp; ${esc(S.person.levelTarget||'?')} → ${esc(S.person.levelMe||'?')}</div>`:''}
       </div>
       <div class="sc">
         <div class="st">⚡ 동기 (Process 4단계)</div>
@@ -1207,19 +1363,15 @@ function rCard(){
           <div style="width:100%;font-size:11px;font-weight:600;color:var(--pm);margin-bottom:2px">🤝 후원</div>
           ${trkActs.filter(a=>a.s==='신뢰'||a.s==='STP'||a.s==='장스오'||a.s==='시스템'||a.s==='소개'||a.s==='기타').map(a=>`<button class="tb ${a.checked?'a':''}" onclick="trkTogCard('${a.id}',${cardDay})" style="font-size:11px;padding:5px 10px">${a.s}</button>`).join('')}
         </div>
-      </div>`:''}`;
-  }else if(t===1){
-    const mo2=am();
-    const hasMonthly=mo2.goalLong||mo2.goalMid||mo2.goalShort;
-    const synced=c.goalLong===mo2.goalLong&&c.goalMid===mo2.goalMid&&c.goalShort===mo2.goalShort;
-    tc=`<div class="sc">
-      <div class="st">🎯 목표(What)</div>
-      <div style="background:var(--g1);border-radius:8px;padding:8px;margin-bottom:10px;font-size:11px;color:var(--p)">역산: 최종→중기→단기 &nbsp;|&nbsp; 월간 목표에서 자동 연동됩니다</div>
-      ${hasMonthly&&!synced?`<button class="tb a" onclick="syncGoals()" style="width:100%;margin-bottom:10px;padding:10px;font-size:12px">🔄 월간 목표에서 다시 가져오기</button>`:''}
-      <div class="fl"><label class="fl-l">익익월 (최종)</label><textarea rows="2" class="by" placeholder="최종 목표" onchange="uc('goalLong',this.value)">${esc(c.goalLong)}</textarea></div>
-      <div class="fl"><label class="fl-l">익월 (중기)</label><textarea rows="2" class="bo" placeholder="중기 목표" onchange="uc('goalMid',this.value)">${esc(c.goalMid)}</textarea></div>
-      <div class="fl"><label class="fl-l">당월 (단기)</label><textarea rows="2" class="bb" placeholder="이번 달 목표" onchange="uc('goalShort',this.value)">${esc(c.goalShort)}</textarea></div>
-    </div>`;
+      </div>`:''}
+      <div class="sc">
+        <div class="st">🎯 3개월 목표</div>
+        <div style="background:var(--g1);border-radius:8px;padding:8px;margin-bottom:10px;font-size:11px;color:var(--p)">역산: 최종→중기→단기 &nbsp;|&nbsp; 월간 목표에서 자동 연동됩니다</div>
+        ${hasMonthly&&!synced?`<button class="tb a" onclick="syncGoals()" style="width:100%;margin-bottom:10px;padding:10px;font-size:12px">🔄 월간 목표에서 다시 가져오기</button>`:''}
+        <div class="fl"><label class="fl-l">익익월 (최종)</label><textarea rows="2" class="by" placeholder="최종 목표" onchange="uc('goalLong',this.value)">${esc(c.goalLong)}</textarea></div>
+        <div class="fl"><label class="fl-l">익월 (중기)</label><textarea rows="2" class="bo" placeholder="중기 목표" onchange="uc('goalMid',this.value)">${esc(c.goalMid)}</textarea></div>
+        <div class="fl"><label class="fl-l">당월 (단기)</label><textarea rows="2" class="bb" placeholder="이번 달 목표" onchange="uc('goalShort',this.value)">${esc(c.goalShort)}</textarea></div>
+      </div>`;
   }else{
     tc=`
       <div class="sc">
@@ -1227,14 +1379,14 @@ function rCard(){
         ${c._autoActivity?`<div style="background:var(--org);border-radius:8px;padding:8px;margin-bottom:8px;font-size:11px;color:#E65100">📌 트래커에서 자동 입력된 활동입니다. 자유롭게 수정하세요.</div>`:''}
         <div class="fl">
           <label class="fl-l">무엇을? (What) — 오늘 이 만남에서 달성할 것</label>
-          <textarea rows="2" style="background:var(--g1);border-color:var(--g2);font-weight:600" placeholder="예) 소비자1으로 전환 — 주변에 제품 전달 약속 받기" onchange="uc('dailyGoal',this.value);am().cards[S.cardIdx]._autoActivity=false">${esc(c.dailyGoal)}</textarea>
+          <textarea rows="2" style="background:var(--g1);border-color:var(--g2);font-weight:600" placeholder="예) 소비자1으로 전환 — 주변에 제품 전달 약속 받기" onchange="uc('dailyGoal',this.value);am().cards[S.cardIdx]._autoActivity=false;autoFillWhyHow(this.value)">${esc(c.dailyGoal)}</textarea>
         </div>
         <div class="fl">
           <label class="fl-l">왜? (Why) — 이것을 달성해야 하는 이유</label>
-          <textarea rows="2" style="background:var(--blu);border-color:#BBDEFB" placeholder="예) 이분이 소비자1이 되면 본인의 자신감이 올라가고 복제의 시작점이 됨" onchange="uc('dailyWhy',this.value)">${esc(c.dailyWhy)}</textarea>
+          <textarea id="why-textarea" rows="${Math.max(2, (c.dailyWhy||'').split('\n').length+1)}" style="background:var(--blu);border-color:#BBDEFB" placeholder="예) 제품:\n신뢰:" onchange="uc('dailyWhy',this.value)">${esc(c.dailyWhy)}</textarea>
         </div>
       </div>
-      <div class="sc"><div class="st">🔧 방법(How)</div><textarea rows="4" placeholder="사전 계획한 질문, 접근 방법" onchange="uc('how',this.value)">${esc(c.how)}</textarea></div>
+      <div class="sc"><div class="st">🔧 방법(How)</div><textarea id="how-textarea" rows="${Math.max(4, (c.how||'').split('\n').length+1)}" placeholder="예) 1. 제품:\n2. 신뢰:" onchange="uc('how',this.value)">${esc(c.how)}</textarea></div>
       <div class="sc"><div class="st">▶️ 진행(Doing)</div><textarea rows="4" placeholder="실제 진행된 내용" onchange="uc('doing',this.value)">${esc(c.doing)}</textarea></div>
       <div class="sc"><div class="st">💡 피드백</div><textarea rows="3" placeholder="잘한 점, 보완할 점" onchange="uc('feedback',this.value)">${esc(c.feedback)}</textarea>
         <div class="fl" style="margin-top:8px"><label class="fl-l">소통 단계</label><div class="tg">${COMMS.map(cl=>`<button class="tb ${c.commLevel===cl?'a':''}" onclick="uc('commLevel',c.commLevel==='${cl}'?'':'${cl}')">${cl}</button>`).join('')}</div></div>
@@ -1249,11 +1401,11 @@ function rCard(){
 
   app.innerHTML=`
     <button class="bb-btn" onclick="S.view='person';render()">← 돌아가기</button>
-    <div class="stb"><button class="${t===0?'a':''}" onclick="S.cardTab=0;render()">기본·활동</button><button class="${t===1?'a':''}" onclick="S.cardTab=1;render()">목표</button><button class="${t===2?'a':''}" onclick="S.cardTab=2;render()">실행·피드백</button></div>
+    <div class="stb"><button class="${t===0?'a':''}" onclick="S.cardTab=0;render()">📋 기본·활동·목표</button><button class="${t===1?'a':''}" onclick="S.cardTab=1;render()">✍️ 실행·피드백</button></div>
     ${tc}
     <div class="bn">
       ${t>0?`<button class="bs" onclick="S.cardTab=${t-1};render()">← 이전</button>`:`<button class="bs" onclick="S.view='person';render()">← 돌아가기</button>`}
-      ${t<2?`<button class="bp" onclick="S.cardTab=${t+1};render()">다음 →</button>`:`<button class="bp" onclick="savPerson();S.view='person';render()">💾 저장</button>`}
+      ${t<1?`<button class="bp" onclick="S.cardTab=${t+1};render()">다음 →</button>`:`<button class="bp" onclick="savPerson();S.view='person';render()">💾 저장</button>`}
     </div>`;
 }
 
