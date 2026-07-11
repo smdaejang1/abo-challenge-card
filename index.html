@@ -174,7 +174,7 @@ function mkPerson(){
 function am(){return S.person?S.person.months[S.person.activeMonth||0]:null}
 
 // ─── State ───
-let S={tab:'dash',view:'main',pid:null,person:null,cardIdx:0,cardTab:0,filter:'all',levelFilter:'all',archIdx:0,archMonth:0,checkupMode:'monthly',dashMonth:0};
+let S={tab:'dash',view:'main',pid:null,person:null,cardIdx:0,cardTab:0,filter:'all',levelFilter:'all',searchQuery:'',archIdx:0,archMonth:0,checkupMode:'monthly',dashMonth:0};
 const app=document.getElementById('app');
 
 function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.remove('hi');setTimeout(()=>e.classList.add('hi'),2000)}
@@ -284,8 +284,52 @@ async function rDash(){
     return cnt;
   });
 
+  // 오늘의 만남 추출
+  const todayNum=now.getDate();
+  const curYM=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const todayMeetings=[];
+  ps.forEach(p=>{
+    const mo=(p.months||[]).find(m=>m.ym===curYM);
+    if(!mo||!mo.tracker)return;
+    const acts=ACTS.filter(a=>a.s!=='PV'&&mo.tracker[a.id+'_'+todayNum]).map(a=>a.s);
+    const hasAny=ACTS.some(a=>mo.tracker[a.id+'_'+todayNum]);
+    if(hasAny) todayMeetings.push({name:p.name,color:p.color,id:p.id,acts});
+  });
+
+  // 백업 리마인더 (매월 25일 이후)
+  const showBackupReminder=todayNum>=25;
+
   app.innerHTML=`
     <div style="margin-top:12px">
+
+      ${showBackupReminder?`
+      <div style="background:#FFF3E0;border:1.5px dashed #FB8C00;border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">💾</span>
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:700;color:#E65100">월말 백업 시기입니다!</div>
+          <div style="font-size:11px;color:#BF360C;margin-top:2px">설정에서 JSON 백업 파일을 저장하고 스폰서에게 공유하세요</div>
+        </div>
+      </div>`:''}
+
+      <div class="sc" style="border:2px solid var(--pm)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${todayMeetings.length?'10px':'0'}">
+          <div class="st" style="margin-bottom:0">📌 오늘의 만남 — ${now.getMonth()+1}월 ${todayNum}일 (${dow[now.getDay()]})</div>
+          <span style="font-size:12px;font-weight:800;color:${todayMeetings.length?'var(--pm)':'var(--mut)'}">${todayMeetings.length}건</span>
+        </div>
+        ${todayMeetings.length
+          ?todayMeetings.map(m=>`
+            <div onclick="openPerson(${m.id})" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border-radius:10px;margin-bottom:6px;cursor:pointer">
+              <div style="width:28px;height:28px;border-radius:50%;background:${m.color||'var(--pm)'};color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">${(m.name||'?')[0]}</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:700">${esc(m.name)||'(이름미입력)'}</div>
+                ${m.acts.length?`<div style="font-size:10px;color:var(--mut)">${m.acts.join(' · ')}</div>`:''}
+              </div>
+              <span style="font-size:14px;color:var(--mut)">→</span>
+            </div>`).join('')
+          :`<div style="font-size:12px;color:var(--mut);text-align:center;padding:8px 0">오늘 예정된 만남이 없습니다</div>`
+        }
+      </div>
+
       <div class="sc">
         <div class="st">📊 현황</div>
         <div class="rw" style="gap:8px;text-align:center">
@@ -387,6 +431,14 @@ async function rPeople(){
     <div style="margin-top:12px">
       <button class="ba" onclick="addPerson()">+ 새 파트너 추가</button>
 
+      <!-- Search -->
+      <div style="position:relative;margin-bottom:8px">
+        <input type="text" id="partner-search" placeholder="🔍 파트너 이름 검색" value="${esc(S.searchQuery||'')}" 
+          oninput="filterPartnerList(this.value)"
+          style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--bdr);font-size:13px;font-family:inherit;background:#fff">
+        <button id="search-clear" onclick="document.getElementById('partner-search').value='';filterPartnerList('')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--mut);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:1;display:${S.searchQuery?'block':'none'}">✕</button>
+      </div>
+
       <!-- Status Filter -->
       <div class="sc" style="padding:10px 14px">
         <div style="font-size:10px;font-weight:600;color:var(--mut);margin-bottom:6px">상태 필터</div>
@@ -417,10 +469,13 @@ function personCard(p){
   const cards=(p.months||[]).reduce((s,mo)=>s+(mo.cards||[]).filter(c=>c.targetName).length,0);
   const st=STATUSES.find(s=>s.id===(p.status||'active'))||STATUSES[0];
   const archCount=(p.archives||[]).length;
-  return`<div class="pc" onclick="openPerson(${p.id})">
+  // 미기록 카드: 날짜가 지났는데 doing/feedback이 비어있는 카드
+  const todayStr=new Date().toISOString().slice(0,10);
+  const unrecorded=(p.months||[]).reduce((s,mo)=>s+(mo.cards||[]).filter(c=>c.date&&c.date<todayStr&&c.targetName&&(!c.doing||!c.doing.trim())&&(!c.feedback||!c.feedback.trim())).length,0);
+  return`<div class="pc" data-pname="${esc(p.name||'')}" onclick="openPerson(${p.id})">
     <div class="pc-ic" style="background:${p.color||'var(--pm)'}">${(p.name||'?')[0]}</div>
     <div style="flex:1">
-      <div class="pc-nm">${esc(p.name)||'(이름 미입력)'} <span style="font-size:10px">${st.icon}</span></div>
+      <div class="pc-nm">${esc(p.name)||'(이름 미입력)'} <span style="font-size:10px">${st.icon}</span>${unrecorded?`<span style="font-size:9px;font-weight:700;background:#FFEBEE;color:#C62828;padding:1px 6px;border-radius:8px;margin-left:4px">미기록 ${unrecorded}</span>`:''}</div>
       <div class="pc-mt">${p.quarter||''} · ${esc(p.levelTarget)||'수준미설정'} · 카드${cards}장${archCount?' · 📂'+archCount+'분기':''}${p.group==='A'?' · 🔥':''}</div>
     </div>
     <button class="pc-del" onclick="event.stopPropagation();delPerson(${p.id})">삭제</button>
@@ -443,6 +498,18 @@ async function delPerson(id){
   await del(id);
   toast('삭제됨');
   render();
+}
+
+// 검색: 리렌더 없이 DOM에서 직접 필터 (포커스 유지, 시간 제약 없음)
+function filterPartnerList(q){
+  S.searchQuery=q;
+  const query=(q||'').trim();
+  document.querySelectorAll('.pc[data-pname]').forEach(el=>{
+    const name=el.getAttribute('data-pname')||'';
+    el.style.display=(!query||name.includes(query))?'':'none';
+  });
+  const clearBtn=document.getElementById('search-clear');
+  if(clearBtn) clearBtn.style.display=query?'block':'none';
 }
 
 async function openPerson(id){
@@ -625,16 +692,19 @@ async function rPerson(){
         <div class="st" style="margin-bottom:0">📝 도전카드 (${filled}/${cards.length}장)</div>
         ${cards.length<31?`<button class="tb" onclick="addCard()" style="font-size:11px">+ 추가</button>`:''}
       </div>
-      ${cards.map((c,i)=>`
-        <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:4px;background:${c.targetName?'var(--g1)':'var(--bg)'};border-radius:9px;cursor:pointer" onclick="openCard(${i})">
+      ${cards.map((c,i)=>{
+        const todayStr2=new Date().toISOString().slice(0,10);
+        const isUnrecorded=c.date&&c.date<todayStr2&&c.targetName&&(!c.doing||!c.doing.trim())&&(!c.feedback||!c.feedback.trim());
+        return`
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:4px;background:${isUnrecorded?'#FFEBEE':c.targetName?'var(--g1)':'var(--bg)'};border-radius:9px;cursor:pointer${isUnrecorded?';border:1px solid #EF9A9A':''}" onclick="openCard(${i})">
           <span style="font-size:11px;font-weight:700;color:${c.targetName?'var(--p)':'var(--mut)'}">${i+1}</span>
           <div style="flex:1">
-            <div style="font-size:13px;font-weight:${c.targetName?600:400};color:${c.targetName?'var(--txt)':'var(--mut)'}">${esc(c.targetName)||'(미작성)'}</div>
+            <div style="font-size:13px;font-weight:${c.targetName?600:400};color:${c.targetName?'var(--txt)':'var(--mut)'}">${esc(c.targetName)||'(미작성)'}${isUnrecorded?`<span style="font-size:9px;font-weight:700;background:#C62828;color:#fff;padding:1px 6px;border-radius:8px;margin-left:5px">미기록</span>`:''}</div>
             <div style="font-size:10px;color:var(--mut)">${c.date}${c.category?' · '+c.category:''}${c.dailyGoal?' · 🎯':''} ${c.dailyAchieved==='Y'?'✅':c.dailyAchieved==='N'?'❌':''}${c.how&&c.how.includes('[이전 피드백]')?' 🔗':''}</div>
           </div>
           ${cards.length>1?`<button class="pc-del" onclick="event.stopPropagation();rmCard(${i})" style="font-size:9px">삭제</button>`:''}
         </div>
-      `).join('')}
+      `}).join('')}
     </div>
 
     <button class="ba" onclick="savPerson()">💾 저장하기</button>
@@ -1239,6 +1309,26 @@ function autoCreateCardForDay(dayNum){
   toast(`${dayNum}일 도전카드가 자동 생성되었습니다`);
 }
 
+// 기존 입력 내용을 보존하면서 항목 병합 (사용자 입력 보호)
+function mergeItemLines(existing,items){
+  const map={};
+  (existing||'').split('\n').forEach(line=>{
+    const m=line.match(/^\s*\d+\.\s*([^:]+):\s*(.*)$/);
+    if(m) map[m[1].trim()]=m[2].trim();
+  });
+  const lines=[];let n=1;
+  items.forEach(it=>{
+    const content=map[it]||'';
+    lines.push(`${n}. ${it}:${content?' '+content:''}`);
+    delete map[it];n++;
+  });
+  // 트래커에서 해제됐어도 사용자 내용이 있으면 유지
+  Object.entries(map).forEach(([k,v])=>{
+    if(v){lines.push(`${n}. ${k}: ${v}`);n++;}
+  });
+  return lines.join('\n');
+}
+
 function updateCardActivities(card,dayNum){
   const mo=am();if(!mo||!mo.tracker)return;const t=mo.tracker;
   const deliveryLabels=[];const supportLabels=[];
@@ -1262,20 +1352,16 @@ function updateCardActivities(card,dayNum){
       .map(s=>s.replace(/PV\s*\d*/,'').trim())
       .filter(s=>s&&s.trim()!=='');
     if(allItems.length>0){
-      // Why: 비어있거나 _autoActivity 카드면 항상 갱신
-      if(!card.dailyWhy||card.dailyWhy.trim()===''||card._autoActivity){
-        card.dailyWhy=allItems.map((it,i)=>`${i+1}. ${it}:`).join('\n');
-      }
-      // How: 비어있거나 이전 피드백만 있거나 _autoActivity면 갱신
-      const howPrefix=card.how&&card.how.startsWith('[이전 피드백]')?card.how+'\n\n':'';
-      if(!card.how||card.how.trim()===''||card.how.startsWith('[이전 피드백]')||card._autoActivity){
-        card.how=howPrefix+allItems.map((it,i)=>`${i+1}. ${it}:`).join('\n');
-      }
+      // Why & How: 기존 입력 내용을 보존하면서 병합 (덮어쓰지 않음)
+      card.dailyWhy=mergeItemLines(card.dailyWhy,allItems);
+      const howPrefix=card.how&&card.how.startsWith('[이전 피드백]')?card.how.split('\n\n')[0]+'\n\n':'';
+      const howBody=howPrefix?card.how.substring(howPrefix.length):card.how;
+      card.how=howPrefix+mergeItemLines(howBody,allItems);
     }
   }
 }
 
-// What 항목 기반으로 Why/How 구조 자동 생성
+// What 항목 기반으로 Why/How 구조 자동 생성 (기존 입력 보존 병합)
 function autoFillWhyHow(whatVal){
   const card=am()?.cards[S.cardIdx];
   if(!card)return;
@@ -1284,22 +1370,17 @@ function autoFillWhyHow(whatVal){
   const items=raw.split(/[|,]/).map(s=>s.replace(/^\d+\.\s*/,'').trim()).filter(Boolean);
   if(items.length===0)return;
 
-  // Why: 이미 내용이 있으면 덮어쓰지 않음
-  if(!card.dailyWhy||card.dailyWhy.trim()===''){
-    const whyText=items.map((it,i)=>`${i+1}. ${it}:`).join('\n');
-    card.dailyWhy=whyText;
-    const whyEl=document.getElementById('why-textarea');
-    if(whyEl){whyEl.value=whyText;whyEl.rows=Math.max(2,items.length+1);}
-  }
-  // How: 이미 내용이 있으면 덮어쓰지 않음
-  if(!card.how||card.how.trim()===''||card.how.startsWith('[이전 피드백]')){
-    const prefix=card.how&&card.how.startsWith('[이전 피드백]')?card.how+'\n\n':'';
-    const howText=prefix+items.map((it,i)=>`${i+1}. ${it}:`).join('\n');
-    card.how=howText;
-    const howEl=document.getElementById('how-textarea');
-    if(howEl){howEl.value=howText;howEl.rows=Math.max(4,items.length+2);}
-  }
-  save();
+  // Why: 기존 내용 보존하며 병합
+  card.dailyWhy=mergeItemLines(card.dailyWhy,items);
+  const whyEl=document.getElementById('why-textarea');
+  if(whyEl){whyEl.value=card.dailyWhy;whyEl.rows=Math.max(2,card.dailyWhy.split('\n').length+1);}
+
+  // How: 이전 피드백 프리픽스 보존하며 병합
+  const howPrefix=card.how&&card.how.startsWith('[이전 피드백]')?card.how.split('\n\n')[0]+'\n\n':'';
+  const howBody=howPrefix?card.how.substring(howPrefix.length):card.how;
+  card.how=howPrefix+mergeItemLines(howBody,items);
+  const howEl=document.getElementById('how-textarea');
+  if(howEl){howEl.value=card.how;howEl.rows=Math.max(4,card.how.split('\n').length+2);}
 }
 
 function scheduleNext(cardIdx){
