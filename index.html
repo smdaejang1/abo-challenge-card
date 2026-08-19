@@ -120,13 +120,74 @@ async function delCk(id){const db=await odb();return new Promise((r,j)=>{const t
 const CLEVELS=['제로소비자','소비자','소비자1','소비자2','소비자3'];
 const CLEVEL_DESC={'제로소비자':'제품 X','소비자':'제품 O · 전달 X','소비자1':'제품 O · 전달 O','소비자2':'소비자1 후원','소비자3':'소비자2 후원'};
 const RELSTAGE_DESC={1:'관심',2:'친한',3:'신뢰',4:'함께/승-승'};
+const LEVEL_GAP={
+  '제로소비자':'필요성을 못 느낌','소비자':'좋았던 이유를 언어화 못함','소비자1':'확신이 없어 반복이 안 됨',
+  '소비자2':'후원자 역할 인식이 약함','소비자3':'노하우를 언어로 설명 못함',
+};
+const WHYHOW_GUIDE={
+  '제로소비자':{
+    '제품':{why:'현재 생활에서 가장 불편한 점이 무엇인지 확인해보면 어떨까요?',how:'새로운 방법이나 제품을 경험해봐도 괜찮을지 물어보려면 어떤 질문이 좋을까요?'},
+    'Tool':{why:'지금 가장 궁금한 주제가 무엇인지 확인해보면 어떨까요?',how:'관련 자료를 함께 살펴봐도 괜찮을지 물어보려면 어떤 질문이 좋을까요?'},
+    '신뢰':{why:'편하게 이야기 나눌 사이가 되었는지 확인해보면 어떨까요?',how:'요즘 어떻게 지내시는지 안부부터 물어보려면 어떤 질문이 좋을까요?'},
+    'STP':{why:'지금 생활에서 바꾸고 싶은 부분이 있는지 확인해보면 어떨까요?',how:'새로운 가능성 이야기를 들어봐도 괜찮을지 물어보려면 어떤 질문이 좋을까요?'},
+    '장스오':{why:'아직 구매 경험이 없다는 걸 확인했는지 돌아보면 어떨까요?',how:'먼저 체험할 기회를 만들어드리려면 어떤 질문이 좋을까요?'},
+    '시스템':{why:'가벼운 모임에 초대할 준비가 되었는지 확인해보면 어떨까요?',how:'부담 없는 자리부터 함께 가보자고 하려면 어떤 질문이 좋을까요?'},
+    '소개':{why:'본인이 아직 확신이 있는지 없는지 확인해보면 어떨까요?',how:'먼저 직접 경험할 기회를 만들어주려면 어떤 질문이 좋을까요?'},
+    '기타':{why:'오늘 가장 확인하고 싶은 게 무엇인지 물어보면 어떨까요?',how:'편한 자리에서 자연스럽게 이야기 나누려면 어떤 질문이 좋을까요?'},
+  },
+  '소비자':{
+    '제품':{why:'사용하면서 좋았던 점을 스스로 말할 수 있는지 확인해보면 어떨까요?',how:'사용하면서 가장 좋았던 점을 물어보려면 어떤 질문이 좋을까요?'},
+    'Tool':{why:'더 활용하기 위해 필요한 정보가 있는지 확인해보면 어떨까요?',how:'다른 제품 정보도 함께 살펴보려면 어떤 질문이 좋을까요?'},
+    '신뢰':{why:'일상 이야기까지 편하게 나누고 있는지 확인해보면 어떨까요?',how:'요즘 관심사를 좀 더 물어보려면 어떤 질문이 좋을까요?'},
+    'STP':{why:'사업 이야기를 들어본 적이 있는지 확인해보면 어떨까요?',how:'새로운 가능성 이야기를 편하게 꺼내려면 어떤 질문이 좋을까요?'},
+    '장스오':{why:'정기구매 개념을 알고 있는지 확인해보면 어떨까요?',how:'자동주문이 얼마나 편한지 알려주려면 어떤 질문이 좋을까요?'},
+    '시스템':{why:'정기 모임을 경험해본 적이 있는지 확인해보면 어떨까요?',how:'가까운 모임에 함께 가보자고 하려면 어떤 질문이 좋을까요?'},
+    '소개':{why:'만족한 점을 스스로 확인했는지 물어보면 어떨까요?',how:'가장 만족한 점이 무엇인지 물어보려면 어떤 질문이 좋을까요?'},
+    '기타':{why:'제품 외에 어떤 관심사가 있는지 확인해보면 어떨까요?',how:'요즘 관심 두는 다른 이야기를 물어보려면 어떤 질문이 좋을까요?'},
+  },
+  '소비자1':{
+    '제품':{why:'자신의 경험을 전할 만큼 확신이 있는지 확인해보면 어떨까요?',how:'전하고 싶은 경험이 있는지 물어보려면 어떤 질문이 좋을까요?'},
+    'Tool':{why:'도구를 스스로 활용해본 적이 있는지 확인해보면 어떨까요?',how:'직접 활용해보도록 건네주려면 어떤 질문이 좋을까요?'},
+    '신뢰':{why:'사업 외의 고민까지 나눌 사이가 되었는지 확인해보면 어떨까요?',how:'요즘 어떤 고민이 있는지 물어보려면 어떤 질문이 좋을까요?'},
+    'STP':{why:'스스로 사업을 설명해본 적이 있는지 확인해보면 어떨까요?',how:'함께 사업설명 자리를 만들어보려면 어떤 질문이 좋을까요?'},
+    '장스오':{why:'스마트오더가 습관으로 자리잡았는지 확인해보면 어떨까요?',how:'함께 설정해보자고 제안하려면 어떤 질문이 좋을까요?'},
+    '시스템':{why:'시스템 참여가 익숙해졌는지 확인해보면 어떨까요?',how:'정기모임에 함께 참석해보자고 하려면 어떤 질문이 좋을까요?'},
+    '소개':{why:'비슷한 필요를 가진 사람이 주변에 있는지 확인해보면 어떨까요?',how:'주변에 필요한 분이 있는지 물어보려면 어떤 질문이 좋을까요?'},
+    '기타':{why:'자기만의 루틴이 자리잡았는지 확인해보면 어떨까요?',how:'본인에게 맞는 방법을 물어보려면 어떤 질문이 좋을까요?'},
+  },
+  '소비자2':{
+    '제품':{why:'함께한 소비자1이 스스로 사용법을 익혔는지 확인해보면 어떨까요?',how:'소비자1의 사용 경험을 함께 점검하려면 어떤 질문이 좋을까요?'},
+    'Tool':{why:'소비자1에게 도구 활용법을 보여준 적이 있는지 확인해보면 어떨까요?',how:'도구 쓰는 법을 함께 보여주려면 어떤 질문이 좋을까요?'},
+    '신뢰':{why:'너무 많이 설명하거나 대신해준 부분은 없었는지 돌아보면 어떨까요?',how:'소비자1의 고민을 먼저 들어보려면 어떤 질문이 좋을까요?'},
+    'STP':{why:'소비자1이 스스로 사업을 설명해본 적이 있는지 확인해보면 어떨까요?',how:'함께 사업설명 자리를 만들어보려면 어떤 질문이 좋을까요?'},
+    '장스오':{why:'소비자1의 스마트오더 설정을 도운 적이 있는지 확인해보면 어떨까요?',how:'설정 여부를 함께 확인해보려면 어떤 질문이 좋을까요?'},
+    '시스템':{why:'소비자1과 함께 모임에 참석한 적이 있는지 확인해보면 어떨까요?',how:'이번 주 모임에 같이 가보자고 하려면 어떤 질문이 좋을까요?'},
+    '소개':{why:'소비자1이 스스로 소개할 수 있게 되었는지 확인해보면 어떨까요?',how:'소개를 함께 도와주려면 어떤 질문이 좋을까요?'},
+    '기타':{why:'팀 전체의 근황을 챙기고 있는지 확인해보면 어떨까요?',how:'한 명씩 근황을 물어보려면 어떤 질문이 좋을까요?'},
+  },
+  '소비자3':{
+    '제품':{why:'자신의 노하우를 다른 사람에게 설명할 수 있는지 확인해보면 어떨까요?',how:'경험을 이야기로 풀어서 나누려면 어떤 질문이 좋을까요?'},
+    'Tool':{why:'도구 활용법을 체계적으로 전달할 수 있는지 확인해보면 어떨까요?',how:'노하우를 팀에게 공유하려면 어떤 질문이 좋을까요?'},
+    '신뢰':{why:'신뢰를 쌓는 자신만의 방법을 설명할 수 있는지 확인해보면 어떨까요?',how:'본인의 노하우를 나누려면 어떤 질문이 좋을까요?'},
+    'STP':{why:'사업설명 방식을 다른 사람이 따라 할 수 있게 정리했는지 확인해보면 어떨까요?',how:'팀과 함께 방식을 정리하려면 어떤 질문이 좋을까요?'},
+    '장스오':{why:'습관화 노하우를 다른 사람에게 전할 수 있는지 확인해보면 어떨까요?',how:'정착 노하우를 팀에게 공유하려면 어떤 질문이 좋을까요?'},
+    '시스템':{why:'시스템 활용법을 직접 시범 보인 적이 있는지 확인해보면 어떨까요?',how:'팀에게 직접 시범을 보이려면 어떤 질문이 좋을까요?'},
+    '소개':{why:'소개하는 방법을 다른 사람에게 전할 수 있는지 확인해보면 어떨까요?',how:'팀과 함께 방법을 정리하려면 어떤 질문이 좋을까요?'},
+    '기타':{why:'자신만의 관리 루틴을 팀에게 전한 적이 있는지 확인해보면 어떨까요?',how:'루틴을 팀에게 공유하려면 어떤 질문이 좋을까요?'},
+  },
+};
+function whyHowHint(level,item,kind){
+  const lv=WHYHOW_GUIDE[level];if(!lv)return '';
+  const g=lv[item];if(!g)return '';
+  return g[kind]||'';
+}
 const PSTEPS=['needs','준비','적용','결과'];
 const COMMS=['1류:이해','2류:설득','3류:강요','4류:구박'];
 const STATUSES=[{id:'active',label:'활동 중',icon:'🟢'},{id:'hold',label:'보류',icon:'🟡'},{id:'grad',label:'졸업(독립)',icon:'🎓'}];
 const ACTS=[{id:'pv',g:'만남',s:'PV',t:'num'},{id:'prod',g:'전달',s:'제품',t:'chk'},{id:'tool',g:'',s:'Tool',t:'chk'},{id:'trust',g:'후원',s:'신뢰',t:'chk'},{id:'stp',g:'',s:'STP',t:'chk'},{id:'evt',g:'',s:'장스오',t:'chk'},{id:'sys',g:'',s:'시스템',t:'chk'},{id:'ref',g:'',s:'소개',t:'chk'},{id:'etc',g:'',s:'기타',t:'chk'}];
 const COLORS=['#2D6A4F','#558B2F','#00695C','#4527A0','#C62828','#E65100','#1565C0','#6A1B9A','#AD1457','#00838F','#827717','#37474F','#D84315','#1B5E20','#283593','#4E342E','#00796B','#5D4037','#7B1FA2','#0277BD','#9E9D24','#546E7A','#BF360C','#33691E','#303F9F','#3E2723','#004D40','#795548','#6A1B9A','#01579B'];
 
-function mkCard(monthData){const n=new Date();return{date:n.toISOString().split('T')[0],targetName:'',category:'신',processSteps:[],goalLong:monthData?monthData.goalLong||'':'',goalMid:monthData?monthData.goalMid||'':'',goalShort:monthData?monthData.goalShort||'':'',dailyGoal:'',dailyWhy:'',dailyAchieved:'',_autoActivity:false,how:'',doing:'',feedback:'',commLevel:''}}
+function mkCard(monthData){const n=new Date();return{date:n.toISOString().split('T')[0],targetName:'',category:'신',processSteps:[],goalLong:monthData?monthData.goalLong||'':'',goalMid:monthData?monthData.goalMid||'':'',goalShort:monthData?monthData.goalShort||'':'',dailyGoal:'',dailyWhy:'',dailyAchieved:'',_autoActivity:false,how:'',doing:'',feedback:'',fb1:'',fb2:'',fb3:'',fb4:'',commLevel:''}}
 
 function mkMonth(ym){return{ym:ym||'',goalLong:'',goalMid:'',goalShort:'',currentStatus:'',week1:'',week2:'',week3:'',week4:'',wkFb1:'',wkFb2:'',wkFb3:'',wkFb4:'',monthFbAchieve:'',monthFbImprove:'',monthFbNext:'',myFeedback:'',sponsorFeedback:'',tracker:{},cards:[mkCard()]}}
 
@@ -174,13 +235,14 @@ function mkPerson(){
 function am(){return S.person?S.person.months[S.person.activeMonth||0]:null}
 
 // ─── State ───
-let S={tab:'dash',view:'main',pid:null,person:null,cardIdx:0,cardTab:0,filter:'all',levelFilter:'all',searchQuery:'',archIdx:0,archMonth:0,checkupMode:'monthly',dashMonth:0};
+let S={tab:'dash',view:'main',pid:null,person:null,cardIdx:0,cardTab:0,filter:'all',levelFilter:'all',searchQuery:'',archIdx:0,archMonth:0,checkupMode:'monthly',dashMonth:0,prevPid:null};
 const app=document.getElementById('app');
 
 function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.remove('hi');setTimeout(()=>e.classList.add('hi'),2000)}
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 // ─── Navigation ───
+function goScheduleFromPerson(){S.tab='schedule';S.view='main';updTabs();render()}
 function goTab(t){S.tab=t;S.view='main';S.pid=null;S.person=null;updTabs();render()}
 function updTabs(){document.querySelectorAll('.btab button').forEach(b=>b.classList.remove('a'));const el=document.getElementById('tab-'+S.tab);if(el)el.classList.add('a')}
 
@@ -536,8 +598,103 @@ async function rPerson(){
     return mm+'월'+(isCur?' ● 이번달':'');
   });
 
+  // ── 한 장 요약 카드 데이터 ──
+  const curMo=p.months.find(m=>m.ym===curYM)||p.months[mi];
+  const allCards=p.months.reduce((a,m)=>a.concat((m.cards||[]).filter(c=>c.targetName)),[]);
+  const lastCard=allCards.length?allCards[allCards.length-1]:null;
+  const lastCardDate=lastCard?lastCard.date:'';
+  const lastDoing=lastCard?lastCard.doing||'':'';
+  const lastFb=lastCard?lastCard.feedback||'':'';
+  const totalCards=allCards.length;
+  const trackerDays=Object.keys(curMo.tracker||{}).filter(k=>k.startsWith('pv_')).length;
+  const nextDate=lastCard?lastCard.nextMeetDate||'':'';
+
   app.innerHTML=`
     <button class="bb-btn" onclick="savAndBack()">← 저장 후 돌아가기</button>
+
+    <!-- ★ 한 장 요약 카드 -->
+    <div style="background:linear-gradient(135deg,#1B2A4A 0%,#2A4070 100%);border-radius:14px;padding:16px;margin-bottom:12px;color:white">
+
+      <!-- 이름·분기·그룹 -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:42px;height:42px;border-radius:50%;background:${p.color||'var(--pm)'};display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;flex-shrink:0">${(p.name||'?')[0]}</div>
+        <div style="flex:1">
+          <div style="font-size:17px;font-weight:800;letter-spacing:-0.3px">${esc(p.name)||'이름 미입력'}</div>
+          <div style="font-size:11px;opacity:0.65;margin-top:2px">${esc(p.quarter||'')} · ${p.group==='A'?'🔥 집중':'📋 일반'}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:9px;opacity:0.55;margin-bottom:2px">이번달 만남</div>
+          <div style="font-size:24px;font-weight:800;line-height:1">${trackerDays}</div>
+          <div style="font-size:9px;opacity:0.55">회</div>
+        </div>
+      </div>
+
+      <!-- 관계 · 수준 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:10px">
+        ${[
+          {label:'개인 관계',val:p.relPersonal},
+          {label:'사업 관계',val:p.relBusiness},
+          {label:'상대 수준',val:p.levelTarget},
+          {label:'나의 역할',val:p.levelMe}
+        ].map(item=>`
+          <div style="background:rgba(255,255,255,0.12);border-radius:8px;padding:7px 5px;text-align:center">
+            <div style="font-size:8px;opacity:0.55;margin-bottom:3px;line-height:1.2">${item.label}</div>
+            <div style="font-size:11px;font-weight:700;line-height:1.2">${esc(item.val||'-')}</div>
+          </div>`).join('')}
+      </div>
+
+      <!-- 분기 월간 목표 3단 -->
+      <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;margin-bottom:10px">
+        <div style="font-size:9px;opacity:0.55;letter-spacing:1px;margin-bottom:7px">📅 분기 목표</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          ${p.months.map((m,i)=>{
+            const mm=parseInt((m.ym||'').split('-')[1])||0;
+            const isCur=m.ym===curYM;
+            const gs=m.goalShort||'';
+            const gm=m.goalMid||'';
+            const bg=isCur?'rgba(255,255,255,0.20)':'rgba(255,255,255,0.06)';
+            const border=isCur?'1.5px solid rgba(255,255,255,0.45)':'1px solid rgba(255,255,255,0.12)';
+            return`<div style="border-radius:6px;padding:6px 9px;background:${bg};border:${border}">
+              <div style="display:flex;align-items:baseline;gap:6px">
+                <span style="font-size:9px;opacity:0.6;flex-shrink:0">${mm?mm+'월':'미설정'}${isCur?' ●':''}</span>
+                <span style="font-size:12px;font-weight:${isCur?700:500}">${esc(gs||'미설정')}</span>
+              </div>
+              ${gm?`<div style="font-size:10px;opacity:0.55;margin-top:1px">↑ 익월: ${esc(gm)}</div>`:''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- 마지막 만남 -->
+      ${lastCard?`
+      <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;margin-bottom:10px">
+        <div style="font-size:9px;opacity:0.55;letter-spacing:1px;margin-bottom:6px">📋 마지막 만남 · ${esc(lastCardDate)}</div>
+        <div style="font-size:12px;opacity:0.85;white-space:pre-line;line-height:1.5;max-height:56px;overflow:hidden">${esc(lastDoing?lastDoing.substring(0,130)+(lastDoing.length>130?'...':''):'Doing 미기록')}</div>
+        ${lastFb?`<div style="margin-top:7px;padding-top:7px;border-top:1px solid rgba(255,255,255,0.12);font-size:11px;opacity:0.7">💬 ${esc(lastFb.substring(0,90))}${lastFb.length>90?'...':''}</div>`:''}
+        ${nextDate?`<div style="margin-top:5px;font-size:11px;color:#90CAF9">🗓 다음 만남 예정: ${esc(nextDate)}</div>`:''}
+      </div>`:''}
+
+      <!-- 통계 3칸 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:10px">
+        ${[
+          {n:totalCards,label:'전체 카드'},
+          {n:(p.archives||[]).length,label:'지난 분기'},
+          {n:trackerDays,label:'이번달 만남'}
+        ].map(s=>`
+          <div style="text-align:center;background:rgba(255,255,255,0.08);border-radius:8px;padding:8px">
+            <div style="font-size:22px;font-weight:800;line-height:1">${s.n}</div>
+            <div style="font-size:9px;opacity:0.55;margin-top:3px">${s.label}</div>
+          </div>`).join('')}
+      </div>
+
+      <!-- 빠른 이동 버튼 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <button onclick="S.view='monthly';render()" style="padding:9px 4px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);border-radius:8px;color:white;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer">📅 월간 목표</button>
+        <button onclick="S.view='card';render()" style="padding:9px 4px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);border-radius:8px;color:white;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer">📋 도전카드</button>
+        <button onclick="S.prevPid=S.pid;goScheduleFromPerson()" style="padding:9px 4px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);border-radius:8px;color:white;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer">📆 스케줄</button>
+      </div>
+    </div>
+    <!-- ★ 한 장 요약 카드 끝 -->
 
     <div class="sc">
       <div class="st">👤 기본 정보</div>
@@ -918,8 +1075,14 @@ function closeQuarter(){
   render();
 }
 async function savAndBack(){
-  if(S.person){S.person.updatedAt=new Date().toISOString();await sav(S.person)}
-  S.view='main';S.pid=null;S.person=null;render();
+  if(S.person){
+    S.person.updatedAt=new Date().toISOString();
+    await sav(S.person);
+    S.view='person';
+    render();
+  } else {
+    S.view='main';S.pid=null;S.person=null;render();
+  }
 }
 
 // startNewQuarter removed — replaced by closeQuarter
@@ -943,7 +1106,7 @@ function rArchive(){
   const cards=(mo.cards||[]).filter(c=>c.targetName);
 
   app.innerHTML=`
-    <button class="bb-btn" onclick="S.view='person';render()">← 돌아가기</button>
+    <button class="bb-btn" onclick="savAndBack()">← 저장 후 돌아가기</button>
     <div class="sc">
       <div class="st">🔒 ${esc(arc.quarter)} (마감됨 · 읽기 전용)</div>
       <div style="font-size:12px;color:var(--mut);margin-bottom:8px">수준: ${esc(arc.levelTarget||'?')} → ${esc(arc.levelMe||'?')}</div>
@@ -995,6 +1158,8 @@ const MONTHLY_GOALS=[
 ];
 
 // ─── Monthly View ───
+function saveMonthlyAndBack(){syncMonthlyToCards();savPerson();S.view='person';render()}
+
 function rMonthly(){
   const p=S.person;
   const mi=p.activeMonth||0;
@@ -1019,7 +1184,7 @@ function rMonthly(){
   const level=p.levelTarget||'';
 
   app.innerHTML=`
-    <button class="bb-btn" onclick="S.view='person';render()">← 돌아가기</button>
+    <button class="bb-btn" onclick="saveMonthlyAndBack()">← 저장 후 돌아가기</button>
     
     <!-- Month tabs -->
     <div class="stb" style="margin-bottom:6px">
@@ -1192,7 +1357,7 @@ function rMonthly(){
     </div>
 
     <div class="bn">
-      <button class="bs" onclick="S.view='person';render()">← 돌아가기</button>
+      <button class="bs" onclick="saveMonthlyAndBack()">← 저장 후 돌아가기</button>
       <button class="bp" onclick="syncMonthlyToCards();savPerson();S.view='person';render()">💾 저장 & 도전카드 연동</button>
     </div>
   `;
@@ -1310,7 +1475,83 @@ function autoCreateCardForDay(dayNum){
 }
 
 // 기존 입력 내용을 보존하면서 항목 병합 (사용자 입력 보호)
-function mergeItemLines(existing,items){
+function relationSummaryText(){
+  const p=S.person||{};
+  if(!p.relPersonal&&!p.levelTarget) return '';
+  const rel=`개인${p.relPersonal||'?'}${p.relPersonal?'('+RELSTAGE_DESC[parseInt(p.relPersonal)]+')':''}/사업${p.relBusiness||'?'}${p.relBusiness?'('+RELSTAGE_DESC[parseInt(p.relBusiness)]+')':''}`;
+  const lvl=`${p.levelTarget||'?'}→${p.levelMe||'?'}`;
+  return `관계:${rel} | ${lvl}`;
+}
+function gapLineHTML(){
+  const p=S.person||{};
+  const gap=LEVEL_GAP[p.levelTarget];
+  if(!gap) return '';
+  return `<div style="font-size:11px;color:#E65100;font-weight:600;margin-bottom:6px">지금 막힌 지점: ${gap}</div>`;
+}
+function personBadgeHTML(showGap){
+  const p=S.person||{};
+  if(!p.relPersonal&&!p.levelTarget) return '';
+  const gap=LEVEL_GAP[p.levelTarget];
+  const c=am()?.cards[S.cardIdx];
+  // 활동 항목만 추출 (관계·수준 제외)
+  const actItems=c?parseActItems(c.dailyGoal):[];
+  const actLine=actItems.length?actItems.join(', '):'';
+  return `<div style="background:var(--g1);border-radius:8px;padding:8px 10px;margin-top:4px;margin-bottom:8px;font-size:11px;line-height:1.9">
+    ${actLine?`<div style="font-weight:700;color:var(--p)">${esc(actLine)}</div>`:''}
+    <div style="color:var(--txt)">관계: 개인${esc(p.relPersonal||'?')}${p.relPersonal?'('+RELSTAGE_DESC[parseInt(p.relPersonal)]+')':''} / 사업${esc(p.relBusiness||'?')}${p.relBusiness?'('+RELSTAGE_DESC[parseInt(p.relBusiness)]+')':''}</div>
+    <div style="color:var(--pm);font-weight:600">${esc(p.levelTarget||'?')} → ${esc(p.levelMe||'?')}</div>
+    ${showGap&&gap?`<div style="color:#E65100;font-weight:600">지금 막힌 지점: ${gap}</div>`:''}
+  </div>`;
+}
+
+function parseActItems(dailyGoal){
+  // 관계: 이후 부분 제거 (관계·수준 정보 제외)
+  const raw=(dailyGoal||'').split(/관계:/)[0];
+  // 📦전달 / 🤝후원 파트에서 항목만 추출
+  return raw.replace(/📦|🤝|🎯/g,'').split(/[,|·]/).map(s=>s.trim()).filter(s=>s&&!s.includes('→')&&!s.includes('단계')&&!s.includes('소비자')&&!s.includes('제로'));
+}
+
+function parseItemMap(text){
+  const map={};
+  (text||'').split('\n').forEach(line=>{
+    const m=line.match(/^\s*\d+\.\s*([^:]+):\s*(.*)$/);
+    if(m) map[m[1].trim()]=m[2].trim();
+  });
+  return map;
+}
+
+function buildItemHTML(field, items, kind, currentText, lvl){
+  const map=parseItemMap(currentText);
+  return items.map((it,i)=>{
+    const hint=whyHowHint(lvl,it,kind);
+    const val=map[it]||'';
+    return `<div style="margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:4px">${i+1}. ${esc(it)}</div>
+      ${hint?`<div style="font-size:11px;color:var(--mut);margin-bottom:4px;padding:5px 8px;background:#F8FAFC;border-radius:5px;border-left:2px solid #C8D8E8;font-style:italic">
+        <span style="font-size:10px;font-weight:700;color:#7A99BB;letter-spacing:0.5px">📌 제안 </span>${esc(hint)}
+      </div>`:''}
+      <div style="font-size:10px;font-weight:700;color:var(--p);margin-bottom:3px">✏️ 내 생각(실행)</div>
+      <textarea rows="2" style="width:100%;${kind==='why'?'background:var(--blu);border-color:#BBDEFB':''}"
+        data-item="${esc(it)}" data-field="${field}"
+        placeholder="${it}:"
+        onchange="updateItemField('${field}','${esc(it)}',this.value)"
+      >${esc(val)}</textarea>
+    </div>`;
+  }).join('');
+}
+
+function updateItemField(field, item, val){
+  const c=am()?.cards[S.cardIdx];if(!c)return;
+  const map=parseItemMap(c[field]||'');
+  map[item]=val;
+  // 현재 활동 항목 순서대로 재조합
+  const items=Object.keys(map).filter(k=>map[k]||true);
+  let n=1;
+  const lines=items.map(k=>map[k]!==undefined?`${n++}. ${k}: ${map[k]||''}`:null).filter(Boolean);
+  uc(field, lines.join('\n'));
+}
+
+function mergeItemLines(existing,items,hintFn){
   const map={};
   (existing||'').split('\n').forEach(line=>{
     const m=line.match(/^\s*\d+\.\s*([^:]+):\s*(.*)$/);
@@ -1318,7 +1559,8 @@ function mergeItemLines(existing,items){
   });
   const lines=[];let n=1;
   items.forEach(it=>{
-    const content=map[it]||'';
+    let content=map[it]||'';
+    // 힌트는 제안 박스에만 표시 — 입력란에는 자동 입력하지 않음
     lines.push(`${n}. ${it}:${content?' '+content:''}`);
     delete map[it];n++;
   });
@@ -1344,7 +1586,8 @@ function updateCardActivities(card,dayNum){
   if(deliveryLabels.length) allLabels.push('📦'+deliveryLabels.join(','));
   if(supportLabels.length) allLabels.push('🤝'+supportLabels.join(','));
   if(allLabels.length>0&&(!card.dailyGoal||card._autoActivity)){
-    card.dailyGoal=allLabels.join(' | ');
+    const relTxt=relationSummaryText();
+    card.dailyGoal=allLabels.join(' | ')+(relTxt?' · '+relTxt:'');
     card._autoActivity=true;
 
     // Why & How 자동 구조화 (트래커 항목 순서대로 개별 추출)
@@ -1353,10 +1596,11 @@ function updateCardActivities(card,dayNum){
       .filter(s=>s&&s.trim()!=='');
     if(allItems.length>0){
       // Why & How: 기존 입력 내용을 보존하면서 병합 (덮어쓰지 않음)
-      card.dailyWhy=mergeItemLines(card.dailyWhy,allItems);
+      const lvl=S.person&&S.person.levelTarget;
+      card.dailyWhy=mergeItemLines(card.dailyWhy,allItems,it=>whyHowHint(lvl,it,'why'));
       const howPrefix=card.how&&card.how.startsWith('[이전 피드백]')?card.how.split('\n\n')[0]+'\n\n':'';
       const howBody=howPrefix?card.how.substring(howPrefix.length):card.how;
-      card.how=howPrefix+mergeItemLines(howBody,allItems);
+      card.how=howPrefix+mergeItemLines(howBody,allItems,it=>whyHowHint(lvl,it,'how'));
     }
   }
 }
@@ -1365,20 +1609,22 @@ function updateCardActivities(card,dayNum){
 function autoFillWhyHow(whatVal){
   const card=am()?.cards[S.cardIdx];
   if(!card)return;
-  // 이모지·기호 제거 후 항목 추출 (| 또는 , 구분)
-  const raw=whatVal.replace(/📦|🤝|🎯/g,'').trim();
+  // 이모지·기호 제거 후 항목 추출 (| 또는 , 구분). 관계요약(" · 관계:...")은 파싱 대상에서 제외
+  const beforeRel=whatVal.split(' · 관계:')[0];
+  const raw=beforeRel.replace(/📦|🤝|🎯/g,'').trim();
   const items=raw.split(/[|,]/).map(s=>s.replace(/^\d+\.\s*/,'').trim()).filter(Boolean);
   if(items.length===0)return;
 
-  // Why: 기존 내용 보존하며 병합
-  card.dailyWhy=mergeItemLines(card.dailyWhy,items);
+  // Why: 기존 내용 보존하며 병합 (대상의 소비자 단계 + 활동 항목별 힌트 자동 삽입)
+  const lvl=S.person&&S.person.levelTarget;
+  card.dailyWhy=mergeItemLines(card.dailyWhy,items,it=>whyHowHint(lvl,it,'why'));
   const whyEl=document.getElementById('why-textarea');
   if(whyEl){whyEl.value=card.dailyWhy;whyEl.rows=Math.max(2,card.dailyWhy.split('\n').length+1);}
 
   // How: 이전 피드백 프리픽스 보존하며 병합
   const howPrefix=card.how&&card.how.startsWith('[이전 피드백]')?card.how.split('\n\n')[0]+'\n\n':'';
   const howBody=howPrefix?card.how.substring(howPrefix.length):card.how;
-  card.how=howPrefix+mergeItemLines(howBody,items);
+  card.how=howPrefix+mergeItemLines(howBody,items,it=>whyHowHint(lvl,it,'how'));
   const howEl=document.getElementById('how-textarea');
   if(howEl){howEl.value=card.how;howEl.rows=Math.max(4,card.how.split('\n').length+2);}
 }
@@ -1394,7 +1640,12 @@ function scheduleNext(cardIdx){
   if(!dateStr){toast('년/월을 먼저 설정해 주세요');return}
   let nextCard=mo.cards.find(c=>c.date===dateStr);
   if(!nextCard){if(mo.cards.length>=31){toast('카드 31장 초과');return}nextCard=mkCard(mo);nextCard.date=dateStr;nextCard.targetName=p.name||'';mo.cards.push(nextCard);mo.cards.sort((a,b)=>a.date.localeCompare(b.date))}
-  if(curCard.feedback){const hint='[이전 피드백] '+curCard.feedback;if(!nextCard.how)nextCard.how=hint;else if(!nextCard.how.includes('[이전 피드백]'))nextCard.how=hint+'\n\n'+nextCard.how}
+  // ③ 핵심 질문 → 다음 카드 How에 연결
+  const fb3=curCard.fb3||'';
+  const fb2=curCard.fb2||'';
+  const oldFb=curCard.feedback||''; // 기존 피드백 필드 하위호환
+  const carryHow=fb3?`[다음 핵심 질문] ${fb3}`:(fb2?`[바꿀 것] ${fb2}`:(oldFb?`[이전 피드백] ${oldFb}`:''));
+  if(carryHow){if(!nextCard.how)nextCard.how=carryHow;else if(!nextCard.how.includes('[다음 핵심 질문]')&&!nextCard.how.includes('[이전 피드백]'))nextCard.how=carryHow+'\n\n'+nextCard.how}
   if(curCard.dailyAchieved==='N'&&curCard.dailyGoal&&!nextCard.dailyGoal){nextCard.dailyGoal='[재도전] '+curCard.dailyGoal}
   savPerson();const newIdx=mo.cards.findIndex(c=>c.date===dateStr);
   if(newIdx>=0){S.cardIdx=newIdx;S.cardTab=0;S.view='card'}
@@ -1427,7 +1678,7 @@ function rCard(){
         <div class="st">📝 도전카드 ${S.cardIdx+1}</div>
         <div class="rw"><div class="fl f1"><label class="fl-l">일자</label><input type="date" value="${esc(c.date)}" onchange="uc('date',this.value)"></div><div class="fl f2"><label class="fl-l">대상 이름</label><input type="text" placeholder="이름" value="${esc(c.targetName)}" onchange="uc('targetName',this.value)"></div></div>
         <div class="fl"><label class="fl-l">구분 (APRR)</label><div class="tg">${['신','생','활'].map(v=>`<button class="tb ${c.category===v?'a':''}" onclick="uc('category','${v}')">${v==='신'?'신(신규·RR)':v==='생'?'생(생산성·P)':'활(활동성·A)'}</button>`).join('')}</div></div>
-        ${S.person.relPersonal||S.person.levelTarget?`<div style="background:var(--g1);border-radius:8px;padding:8px;margin-top:4px;font-size:11px;color:var(--p)">관계: 개인${esc(S.person.relPersonal||'?')}${S.person.relPersonal?'('+RELSTAGE_DESC[parseInt(S.person.relPersonal)]+')':''} / 사업${esc(S.person.relBusiness||'?')}${S.person.relBusiness?'('+RELSTAGE_DESC[parseInt(S.person.relBusiness)]+')':''} &nbsp;|&nbsp; ${esc(S.person.levelTarget||'?')} → ${esc(S.person.levelMe||'?')}</div>`:''}
+        ${personBadgeHTML(false)}
       </div>
       <div class="sc">
         <div class="st">⚡ 동기 (Process 4단계)</div>
@@ -1460,32 +1711,91 @@ function rCard(){
         ${c._autoActivity?`<div style="background:var(--org);border-radius:8px;padding:8px;margin-bottom:8px;font-size:11px;color:#E65100">📌 트래커에서 자동 입력된 활동입니다. 자유롭게 수정하세요.</div>`:''}
         <div class="fl">
           <label class="fl-l">무엇을? (What) — 오늘 이 만남에서 달성할 것</label>
-          <textarea rows="2" style="background:var(--g1);border-color:var(--g2);font-weight:600" placeholder="예) 소비자1으로 전환 — 주변에 제품 전달 약속 받기" onchange="uc('dailyGoal',this.value);am().cards[S.cardIdx]._autoActivity=false;autoFillWhyHow(this.value)">${esc(c.dailyGoal)}</textarea>
+          ${(()=>{
+            const p=S.person||{};
+            const actItems=parseActItems(c.dailyGoal);
+            const relLine=p.relPersonal?`관계: 개인${p.relPersonal}${RELSTAGE_DESC[parseInt(p.relPersonal)]?'('+RELSTAGE_DESC[parseInt(p.relPersonal)]+')':''} / 사업${p.relBusiness||'?'}${RELSTAGE_DESC[parseInt(p.relBusiness)]?'('+RELSTAGE_DESC[parseInt(p.relBusiness)]+')':''}`:'' ;
+            const lvlLine=p.levelTarget?`${p.levelTarget} → ${p.levelMe||'?'}`:'';
+            if(actItems.length){
+              return `<div style="background:var(--g1);border:1.5px solid var(--g2);border-radius:8px;padding:10px 12px;margin-bottom:4px;font-size:12px;line-height:1.9">
+                <div style="font-weight:700;color:var(--p)">${esc(actItems.join(', '))}</div>
+                ${relLine?`<div style="color:var(--txt)">${esc(relLine)}</div>`:''}
+                ${lvlLine?`<div style="color:var(--pm);font-weight:600">${esc(lvlLine)}</div>`:''}
+              </div>
+              <div style="font-size:10px;color:var(--mut);margin-bottom:4px">직접 수정하려면 아래에서 편집하세요</div>
+              <textarea rows="2" style="background:var(--g1);border-color:var(--g2);font-size:11px;color:var(--mut)" onchange="uc('dailyGoal',this.value);am().cards[S.cardIdx]._autoActivity=false;autoFillWhyHow(this.value)">${esc(c.dailyGoal)}</textarea>`;
+            }
+            return `<textarea rows="2" style="background:var(--g1);border-color:var(--g2);font-weight:600" placeholder="예) 소비자1으로 전환 — 주변에 제품 전달 약속 받기" onchange="uc('dailyGoal',this.value);am().cards[S.cardIdx]._autoActivity=false;autoFillWhyHow(this.value)">${esc(c.dailyGoal)}</textarea>`;
+          })()}
         </div>
         <div class="fl">
           <label class="fl-l">왜? (Why) — 이것을 달성해야 하는 이유</label>
-          <textarea id="why-textarea" rows="${Math.max(2, (c.dailyWhy||'').split('\n').length+1)}" style="background:var(--blu);border-color:#BBDEFB" placeholder="예) 제품:\n신뢰:" onchange="uc('dailyWhy',this.value)">${esc(c.dailyWhy)}</textarea>
+          ${gapLineHTML()}
+          ${(()=>{
+            const p=S.person||{};
+            const lvl=p.levelTarget||'';
+            const items=parseActItems(c.dailyGoal);
+            return items.length
+              ? buildItemHTML('dailyWhy', items, 'why', c.dailyWhy||'', lvl)
+              : `<textarea id="why-textarea" rows="3" style="background:var(--blu);border-color:#BBDEFB" placeholder="예) 제품:\n신뢰:" onchange="uc('dailyWhy',this.value)">${esc(c.dailyWhy)}</textarea>`;
+          })()}
         </div>
       </div>
-      <div class="sc"><div class="st">🔧 방법(How)</div><textarea id="how-textarea" rows="${Math.max(4, (c.how||'').split('\n').length+1)}" placeholder="예) 1. 제품:\n2. 신뢰:" onchange="uc('how',this.value)">${esc(c.how)}</textarea></div>
+      <div class="sc">
+        <div class="st">🔧 방법(How)</div>
+        ${(()=>{
+          const p=S.person||{};
+          const lvl=p.levelTarget||'';
+          const items=parseActItems(c.dailyGoal);
+          // 이전 피드백 prefix 보존
+          const howText=c.how||'';
+          const prefixMatch=howText.match(/^(\[이전 피드백\][^\n]*\n?\n?)/);
+          const prefix=prefixMatch?prefixMatch[1]:'';
+          const body=prefix?howText.slice(prefix.length):howText;
+          return (items.length
+            ? (prefix?`<div style="background:var(--org);border-radius:7px;padding:7px 10px;margin-bottom:10px;font-size:11px;color:#E65100">${esc(prefix.trim())}</div>`:'')
+              + buildItemHTML('how', items, 'how', body, lvl)
+            : `<textarea id="how-textarea" rows="4" placeholder="예) 1. 제품:\n2. 신뢰:" onchange="uc('how',this.value)">${esc(howText)}</textarea>`);
+        })()}
+      </div>
       <div class="sc"><div class="st">▶️ 진행(Doing)</div><textarea rows="4" placeholder="실제 진행된 내용" onchange="uc('doing',this.value)">${esc(c.doing)}</textarea></div>
-      <div class="sc"><div class="st">💡 피드백</div><textarea rows="3" placeholder="잘한 점, 보완할 점" onchange="uc('feedback',this.value)">${esc(c.feedback)}</textarea>
-        <div class="fl" style="margin-top:8px"><label class="fl-l">소통 단계</label><div class="tg">${COMMS.map(cl=>`<button class="tb ${c.commLevel===cl?'a':''}" onclick="uc('commLevel',c.commLevel==='${cl}'?'':'${cl}')">${cl}</button>`).join('')}</div></div>
+      <div class="sc">
+        <div class="st">💡 피드백</div>
+        <div class="fl">
+          <label class="fl-l" style="color:var(--pm);font-weight:700">① 이 만남에서 발견한 것</label>
+          <div style="font-size:11px;color:var(--mut);margin-bottom:4px">만남 전에는 몰랐는데 알게 된 것 — 니즈, 반응, 상황 변화</div>
+          <textarea rows="2" style="background:var(--g1);border-color:var(--g2)" placeholder="예) 간섬유화 검사를 기다리고 있었다" onchange="uc('fb1',this.value)">${esc(c.fb1||'')}</textarea>
+        </div>
+        <div class="fl">
+          <label class="fl-l" style="color:#E65100;font-weight:700">② 다음에 바꿀 것 (하나만)</label>
+          <div style="font-size:11px;color:var(--mut);margin-bottom:4px">구체적인 행동 변화 딱 하나 — 다음 만남에서 실제로 다르게 할 것</div>
+          <textarea rows="2" style="background:var(--org);border-color:#FFCC80" placeholder="예) 사전에 시간을 약속하고 만나겠다" onchange="uc('fb2',this.value)">${esc(c.fb2||'')}</textarea>
+        </div>
+        <div class="fl">
+          <label class="fl-l" style="color:var(--blue,#1565C0);font-weight:700">③ 다음 만남의 핵심 질문</label>
+          <div style="font-size:11px;color:var(--mut);margin-bottom:4px">다음 카드의 How에 자동 연결됩니다</div>
+          <textarea rows="2" style="background:var(--blu);border-color:#BBDEFB" placeholder="예) 에키네시아 드셔보셨어요?" onchange="uc('fb3',this.value)">${esc(c.fb3||'')}</textarea>
+        </div>
+        <div class="fl">
+          <label class="fl-l" style="color:var(--mut)">④ 기타</label>
+          <textarea rows="2" placeholder="그 외 메모" onchange="uc('fb4',this.value)">${esc(c.fb4||c.feedback||'')}</textarea>
+        </div>
+        <div class="fl" style="margin-top:4px"><label class="fl-l">소통 단계</label><div class="tg">${COMMS.map(cl=>`<button class="tb ${c.commLevel===cl?'a':''}" onclick="uc('commLevel',c.commLevel==='${cl}'?'':'${cl}')">${cl}</button>`).join('')}</div></div>
         ${c.dailyGoal?`<div class="fl" style="margin-top:10px"><label class="fl-l">목표(What) 달성 여부</label><div class="tg"><button class="tb ${c.dailyAchieved==='Y'?'a':''}" onclick="uc('dailyAchieved',c.dailyAchieved==='Y'?'':'Y')">✅ 달성</button><button class="tb ${c.dailyAchieved==='N'?'a':''}" onclick="uc('dailyAchieved',c.dailyAchieved==='N'?'':'N')">❌ 미달성</button></div></div>`:''}
       </div>
       <div class="sc" style="border:2px dashed var(--acc);background:var(--org)">
         <div class="st" style="color:var(--acc)">📅 다음 만남 예약</div>
-        <div style="font-size:12px;color:var(--mut);margin-bottom:10px">피드백의 보완할 점이 다음 카드의 방법(How)에 자동으로 연결됩니다.<br>미달성 목표는 다음 카드에 [재도전]으로 이월됩니다.</div>
+        <div style="font-size:12px;color:var(--mut);margin-bottom:10px">③의 핵심 질문이 다음 카드의 How에 자동 연결됩니다.<br>미달성 목표는 다음 카드에 [재도전]으로 이월됩니다.</div>
         <button class="ba" onclick="scheduleNext(${S.cardIdx})" style="margin:0">📅 다음 만남 날짜 설정 →</button>
       </div>`;
   }
 
   app.innerHTML=`
-    <button class="bb-btn" onclick="S.view='person';render()">← 돌아가기</button>
+    <button class="bb-btn" onclick="savPerson();S.view='person';render()">← 저장 후 돌아가기</button>
     <div class="stb"><button class="${t===0?'a':''}" onclick="S.cardTab=0;render()">📋 기본·활동·목표</button><button class="${t===1?'a':''}" onclick="S.cardTab=1;render()">✍️ 실행·피드백</button></div>
     ${tc}
     <div class="bn">
-      ${t>0?`<button class="bs" onclick="S.cardTab=${t-1};render()">← 이전</button>`:`<button class="bs" onclick="S.view='person';render()">← 돌아가기</button>`}
+      ${t>0?`<button class="bs" onclick="S.cardTab=${t-1};render()">← 이전</button>`:`<button class="bs" onclick="savPerson();S.view='person';render()">← 저장 후 돌아가기</button>`}
       ${t<1?`<button class="bp" onclick="S.cardTab=${t+1};render()">다음 →</button>`:`<button class="bp" onclick="savPerson();S.view='person';render()">💾 저장</button>`}
     </div>`;
 }
@@ -1590,6 +1900,7 @@ async function rSchedule(){
 
   app.innerHTML=`
     <div style="margin-top:12px">
+      ${S.prevPid?`<button class="bb-btn" onclick="openPerson(${S.prevPid});S.prevPid=null" style="margin-bottom:8px">← 저장 후 돌아가기</button>`:''}
       <!-- Month tabs -->
       <div style="display:flex;gap:4px;margin-bottom:8px">
         ${displayYMs.map((ym,i)=>{
@@ -2007,6 +2318,7 @@ async function rSettings(){
         <div class="st">⚙️ 설정</div>
         <div style="font-size:13px;color:var(--mut);margin-bottom:12px">데이터 관리</div>
         <button class="ba" onclick="expAll()" style="margin-bottom:8px">📥 전체 데이터 백업 (JSON)</button>
+        <button class="ba" onclick="expFeedbackReport()" style="margin-bottom:8px;background:linear-gradient(135deg,#1B2A4A,#2A4070);color:white">📋 피드백 리포트 내보내기 (HTML)</button>
         <label class="ba" style="display:block;text-align:center;cursor:pointer;margin-bottom:8px">
           📤 데이터 복원 (v4 JSON)
           <input type="file" accept=".json" style="display:none" onchange="impAll(event)">
@@ -2037,7 +2349,7 @@ async function rSettings(){
       </div>
       <div class="sc">
         <div style="font-size:11px;color:var(--mut);text-align:center">
-          도전카드 관리 v4.0<br>
+          도전카드 관리 v6.0<br>
           저장된 파트너: ${ps.length}명<br>
           데이터는 이 기기에만 저장됩니다
         </div>
@@ -2055,6 +2367,104 @@ async function expAll(){
   a.download=`도전카드_백업_${new Date().toISOString().split('T')[0]}.json`;
   a.click();
   toast('백업 파일 다운로드 완료');
+}
+
+async function expFeedbackReport(){
+  const ps=await all();
+  const today=new Date().toISOString().split('T')[0];
+  const rows=[];
+  ps.forEach(p=>{
+    p.months.forEach(mo=>{
+      (mo.cards||[]).filter(c=>c.targetName||c.doing||c.fb1||c.fb2||c.fb3).forEach(c=>{
+        rows.push({
+          name:p.name||'',
+          level:p.levelTarget||'',
+          relP:p.relPersonal||'',relB:p.relBusiness||'',
+          date:c.date||'',cat:c.category||'',
+          goal:c.dailyGoal||'',why:c.dailyWhy||'',how:c.how||'',
+          doing:c.doing||'',
+          fb1:c.fb1||'',fb2:c.fb2||'',fb3:c.fb3||'',
+          fb4:c.fb4||c.feedback||'',
+          achieved:c.dailyAchieved||'',comm:c.commLevel||''
+        });
+      });
+    });
+  });
+
+  const html=`<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>도전카드 피드백 리포트 ${today}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#F0F4F8;color:#1B2A4A;font-size:14px;line-height:1.6}
+.header{background:#1B2A4A;color:#fff;padding:24px 32px}
+.header h1{font-size:20px;font-weight:700}.header .sub{font-size:12px;color:#A0B4CC;margin-top:4px}
+.ctn{padding:20px 32px 60px;max-width:900px;margin:0 auto}
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 6px rgba(27,42,74,.08);overflow:hidden;margin-bottom:16px}
+.card-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #E8EFF7;flex-wrap:wrap}
+.name{font-size:15px;font-weight:700}.tags{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto}
+.tag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600}
+.tag-rel{background:#FFF3E0;color:#E65100}.tag-lv{background:#E8F5E9;color:#2E7D32}.tag-date{background:#E8EFF7;color:#1B2A4A}
+.card-body{padding:14px 18px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px;font-size:13px}
+.lbl{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;align-self:flex-start;margin-top:2px}
+.lbl-g{background:#E8F5E9;color:#2E7D32}.lbl-b{background:#E3F2FD;color:#1565C0}
+.lbl-o{background:#FFF3E0;color:#E65100}.lbl-d{background:#E8EFF7;color:#1B2A4A}
+.lbl-p{background:#F3E5F5;color:#6A1B9A}
+.fb-section{background:#F8FAFC;border-radius:8px;padding:12px 14px}
+.fb-title{font-size:11px;font-weight:700;color:#1B2A4A;margin-bottom:8px}
+.fb-row{display:flex;gap:8px;margin-bottom:6px;align-items:flex-start;font-size:12px}
+.fb-num{font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.n1{color:#2E7D32}.n2{color:#E65100}.n3{color:#1565C0}.n4{color:#888}
+.txt{color:#333;white-space:pre-line;flex:1}
+.no-fb{font-size:11px;color:#aaa;font-style:italic}
+@media print{body{background:#fff}.card{box-shadow:none;border:1px solid #ddd;break-inside:avoid}.header{-webkit-print-color-adjust:exact}}
+</style></head><body>
+<div class="header">
+  <h1>📋 도전카드 피드백 리포트</h1>
+  <div class="sub">${today} 기준 · 총 ${rows.length}장</div>
+</div>
+<div class="ctn">
+${rows.map(r=>`
+  <div class="card">
+    <div class="card-head">
+      <div class="name">${esc2(r.name)}</div>
+      <div class="tags">
+        <span class="tag tag-date">${esc2(r.date)} · ${esc2(r.cat)}</span>
+        <span class="tag tag-rel">개인${esc2(r.relP)} / 사업${esc2(r.relB)}</span>
+        <span class="tag tag-lv">${esc2(r.level)}</span>
+        ${r.achieved==='Y'?'<span class="tag" style="background:#E8F5E9;color:#2E7D32">✅ 달성</span>':r.achieved==='N'?'<span class="tag" style="background:#FFEBEE;color:#C62828">❌ 미달성</span>':''}
+      </div>
+    </div>
+    <div class="card-body">
+      ${r.goal?`<div class="row"><span class="lbl lbl-g">What</span><span class="txt">${esc2(r.goal)}</span></div>`:''}
+      ${r.why?`<div class="row"><span class="lbl lbl-b">Why</span><span class="txt">${esc2(r.why)}</span></div>`:''}
+      ${r.how?`<div class="row"><span class="lbl lbl-d">How</span><span class="txt">${esc2(r.how)}</span></div>`:''}
+      ${r.doing?`<div class="row"><span class="lbl lbl-g">실행</span><span class="txt">${esc2(r.doing)}</span></div>`:''}
+      ${(r.fb1||r.fb2||r.fb3||r.fb4)?`
+      <div class="fb-section">
+        <div class="fb-title">💡 피드백</div>
+        ${r.fb1?`<div class="fb-row"><span class="fb-num n1">① 발견</span><span class="txt">${esc2(r.fb1)}</span></div>`:''}
+        ${r.fb2?`<div class="fb-row"><span class="fb-num n2">② 바꿀것</span><span class="txt">${esc2(r.fb2)}</span></div>`:''}
+        ${r.fb3?`<div class="fb-row"><span class="fb-num n3">③ 핵심질문</span><span class="txt">${esc2(r.fb3)}</span></div>`:''}
+        ${r.fb4?`<div class="fb-row"><span class="fb-num n4">④ 기타</span><span class="txt">${esc2(r.fb4)}</span></div>`:''}
+      </div>`:`<div class="no-fb">피드백 미작성</div>`}
+      ${r.comm?`<div style="font-size:11px;color:#888;margin-top:2px">소통 단계: ${esc2(r.comm)}</div>`:''}
+    </div>
+  </div>`).join('')}
+</div>
+<div style="position:fixed;bottom:20px;right:20px;display:flex;gap:8px">
+  <button onclick="window.print()" style="padding:10px 18px;background:#1B2A4A;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700">🖨 인쇄/PDF</button>
+</div>
+</body></html>`;
+
+  function esc2(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`도전카드_피드백리포트_${today}.html`;
+  a.click();
+  toast('피드백 리포트 다운로드 완료');
 }
 
 async function impAll(e){
@@ -2155,6 +2565,21 @@ async function clearAll(){
 
 // ─── Init ───
 updTabs();render();
+
+// ─── 서비스워커 등록 (자동 업데이트) ───
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').then(reg=>{
+    // 새 버전 감지 시 자동 갱신
+    reg.addEventListener('updatefound',()=>{
+      const nw=reg.installing;
+      if(nw)nw.addEventListener('statechange',()=>{
+        if(nw.state==='activated'&&navigator.serviceWorker.controller){
+          toast('✨ 새 버전으로 업데이트되었습니다');
+        }
+      });
+    });
+  }).catch(()=>{});
+}
 </script>
 </body>
 </html>
